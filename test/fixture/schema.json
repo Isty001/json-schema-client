@@ -1,0 +1,12 @@
+{
+    "definitions": {
+        "user": {
+        }
+    },
+    "links": [
+        {
+            "rel": "list",
+            "href": "/user/{id}"
+        }
+    ]
+}
