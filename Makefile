@@ -4,8 +4,6 @@ TEST_SOURCES = $(shell find src test -name '*.c' ! -name curl.c) lib/*.c
 compile:
 	gcc -Wall -Wextra -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre -D _GNU_SOURCE
 
-asd: $(a)
-
 run:
 	make compile src="$(SOURCES)" out="client.o"
 	./client.o
