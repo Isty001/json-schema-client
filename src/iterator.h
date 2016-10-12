@@ -5,9 +5,11 @@
 #include "stack.h"
 
 
-typedef void (*IteratorWalkCallback)(void *item);
+typedef void (*WalkCallback)(void *item);
 
-typedef void *(*IteratorMapCallback)(void *item);
+typedef void (*WalkIndexCallback)(void *item, int i);
+
+typedef void *(*MapCallback)(void *item);
 
 typedef struct iterator Iterator;
 
@@ -18,9 +20,11 @@ Iterator *iterator_init_from_stack(Stack *stack);
 
 Iterator *iterator_init_from_stack_destroy(Stack *stack);
 
-void iterator_walk(Iterator *iterator, IteratorWalkCallback callback);
+void iterator_walk(Iterator *iterator, WalkCallback callback);
 
-Iterator *iterator_map(Iterator *iterator, IteratorMapCallback callback);
+void iterator_walk_index(Iterator *iterator, WalkIndexCallback callback);
+
+Iterator *iterator_map(Iterator *iterator, MapCallback callback);
 
 void *iterator_seek(Iterator *iterator, int offset);
 

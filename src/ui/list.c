@@ -44,7 +44,7 @@ static ITEM *add_new_item(char *title)
 
 static void create_link_items(Schema *schema)
 {
-    iterator_walk(schema->links, (IteratorWalkCallback) function(void, (Link * link) {
+    iterator_walk(schema->links, (WalkCallback) function(void, (Link * link) {
         ITEM *item = add_new_item(link->display);
 
         set_item_userptr(item, link);
@@ -53,7 +53,7 @@ static void create_link_items(Schema *schema)
 
 static void create_items(Iterator *schemas)
 {
-    iterator_walk(schemas, (IteratorWalkCallback) function(void, (Schema * schema) {
+    iterator_walk(schemas, (WalkCallback) function(void, (Schema * schema) {
         ITEM *item = add_new_item(schema->name);
         item_opts_off(item, O_SELECTABLE);
 

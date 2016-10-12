@@ -7,9 +7,9 @@
 #include "ui/popup.h"
 
 
-#define BASE_FIELD_storage_KEY "request.form.%s.field.%d"
+#define BASE_REQ_FIELD_KEY "request.form.%s.field.%d"
 
-#define key_size(link) strlen(link->href) + strlen(BASE_FIELD_storage_KEY) + 1
+#define key_size(link) strlen(link->href) + strlen(BASE_REQ_FIELD_KEY) + 1
 
 
 static void create_storage_key(char *key, Link *link, int field_offset)
@@ -17,43 +17,45 @@ static void create_storage_key(char *key, Link *link, int field_offset)
     sprintf(key, "request.form.%s.field.%d", link->href, field_offset);
 }
 
-void request_save_form(FIELD **fields, Link *link)
+void request_save_form(Iterator *fields, Link *link)
 {
     char *buffer;
     char key[key_size(link)];
 
-    for (int i = 0; i < REQ_FIELD_COUNT; i++) {
-        buffer = field_read(fields[i]);
+    iterator_walk(fields, (WalkCallback )function(void, (FIELD *field, int i) {
+        buffer = field_read(field);
 
         if (buffer) {
             create_storage_key(key, link, i);
             storage_set(key, buffer);
         }
-    }
+    }));
 }
 
-void request_load_form(FIELD **fields, Link *link)
+void request_load_form(Iterator *fields, Link *link)
 {
     char *buffer;
     char key[key_size(link)];
 
-    for (int i = 0; i < REQ_FIELD_COUNT; i++) {
+    iterator_walk_index(fields, (WalkIndexCallback )function(void, (FIELD *field, int i) {
         create_storage_key(key, link, i);
 
-        if (is_input(fields[i]) && (buffer = storage_get(key))) {
-            set_field_buffer(fields[i], 0, buffer);
+        if (is_input(field) && (buffer = storage_get(key))) {
+            set_field_buffer(field, 0, buffer);
         }
-    }
+    }));
 }
 
 static void apply_field_on_request(FIELD *field, Request *request)
 {
     char *buffer = field_read(field);
-    FieldAttributes *attr = field_userptr(field);
 
     if (!buffer) {
         return;
     }
+
+    FieldAttributes *attr = field_userptr(field);
+
     switch (attr->type) {
         case FIELD_HEADER:
             request->headers = curl_slist_append(request->headers, buffer);
@@ -87,14 +89,9 @@ Request *request_create_from_form(Iterator *fields, Link *link)
 {
     Request *request = create_request(link);
 
-    iterator_walk(fields, (IteratorWalkCallback) function(void, (FIELD * field)
-            {
-                apply_field_on_request(field, request);
-            }));
-
-#ifndef TEST
-    iterator_destroy(fields);
-#endif
+    iterator_walk(fields, (WalkCallback) function(void, (FIELD * field) {
+        apply_field_on_request(field, request);
+    }));
 
     return request;
 }

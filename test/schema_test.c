@@ -61,7 +61,7 @@ MU_TEST(test_schema_curl)
 static void assert_first_schema(void)
 {
     Schema *schema = iterator_seek(iterator, 0);
-    iterator_walk(schema->links, (IteratorWalkCallback) assert_first_link);
+    iterator_walk(schema->links, (WalkCallback) assert_first_link);
 }
 
 MU_TEST(test_schema_file)

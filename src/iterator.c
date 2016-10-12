@@ -31,14 +31,21 @@ Iterator *iterator_init_from_stack_destroy(Stack *stack)
     return iterator;
 }
 
-void iterator_walk(Iterator *iterator, IteratorWalkCallback callback)
+void iterator_walk(Iterator *iterator, WalkCallback callback)
 {
     for (int i = 0; i < iterator->count; i++) {
         callback(iterator->items[i]);
     }
 }
 
-Iterator *iterator_map(Iterator *iterator, IteratorMapCallback callback)
+void iterator_walk_index(Iterator *iterator, WalkIndexCallback callback)
+{
+    for (int i = 0; i < iterator->count; i++) {
+        callback(iterator->items[i], i);
+    }
+}
+
+Iterator *iterator_map(Iterator *iterator, MapCallback callback)
 {
     Iterator *new = malloc(sizeof(Iterator));
     new->count = iterator->count;

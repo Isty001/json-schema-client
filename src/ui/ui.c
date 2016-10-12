@@ -143,5 +143,6 @@ void ui_show_response(char *str)
 {
     mvwprintw(response, PADDING, PADDING, str);
     wrefresh(response);
+    refresh();
     free(str);
 }

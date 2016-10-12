@@ -35,6 +35,7 @@ typedef struct
     Popup *popup;
     int field_offset;
     int field_width;
+    Iterator *field_iterator;
 } RequestPopup;
 
 
@@ -110,6 +111,7 @@ static void build_form(void)
     build_left_side();
     build_right_side();
     request_popup->fields[request_popup->field_offset] = NULL;
+    request_popup->field_iterator = iterator_init((void *) request_popup->fields, request_popup->field_offset);
 }
 
 static void create_form_window(void)
@@ -129,32 +131,35 @@ static void create_form_window(void)
 
 static void destroy_request_popup(void)
 {
+    ui_popup_close();
+
     unpost_form(request_popup->form);
-//    free_form(request_popup->form);
+    free_form(request_popup->form);
 
     for (int i = 0; i < request_popup->field_offset; i++) {
         field_destroy(request_popup->fields[i]);
     }
+
+    free(request_popup->field_iterator);
     free(request_popup);
 }
 
 static void save_form(void)
 {
-    request_save_form(request_popup->fields, list_current_link());
+    request_save_form(request_popup->field_iterator, list_current_link());
 }
 
 static void send_request(void)
 {
     char *response;
     Request *request;
-    request = request_create_from_form(iterator_init((void *) request_popup->fields, REQ_FIELD_COUNT),
-                                       list_current_link());
 
+    request = request_create_from_form(request_popup->field_iterator, list_current_link());
     response = curl_send_request(request);
 
-    ui_popup_close();
-    ui_show_response(response);
+    save_form();
     destroy_request_popup();
+    ui_show_response(response);
 }
 
 static void handle_input(void)
@@ -163,11 +168,15 @@ static void handle_input(void)
     bool stop = false;
     FORM *form = request_popup->form;
 
-    while ((ch = wgetch(request_popup->popup->window)) != KEY_F(2) && false == stop) {
+    while (false == stop) {
+        ch = wgetch(request_popup->popup->window);
+
         switch (ch) {
             on_input('\n', send_request();
                     stop = true;)
             on_input(KEY_F(4), save_form())
+            on_input(KEY_F(2), destroy_request_popup();
+                    stop = true)
             on_input_form(KEY_DOWN, REQ_NEXT_LINE)
             on_input_form(KEY_UP, REQ_PREV_LINE)
             on_input_form(KEY_LEFT, REQ_PREV_CHAR)
@@ -197,13 +206,10 @@ void popup_request(void)
     init_request_popup();
     build_form();
 
-    request_load_form(request_popup->fields, list_current_link());
+    request_load_form(request_popup->field_iterator, list_current_link());
 
     create_form_window();
     wrefresh(request_popup->popup->window);
 
     handle_input();
-
-
-
 }

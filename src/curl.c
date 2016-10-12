@@ -1,8 +1,10 @@
 #include <curl/curl.h>
 #include <malloc.h>
 #include <string.h>
+#include <stdlib.h>
 #include "curl.h"
 #include "request.h"
+#include "util.h"
 
 
 void curl_init(void)
@@ -15,11 +17,11 @@ void curl_destroy(void)
     curl_global_cleanup();
 }
 
-size_t write_callback(void *ptr, size_t size, size_t nmemb, char **s)
+size_t write_callback(void *ptr, size_t unused(size), size_t unused(nmemb), char **s)
 {
-    asprintf(s, "%s%s", *s, (char *)ptr);
+    *s = strdup(ptr);
 
-    return size * nmemb + 1;
+    return strlen(*s);
 }
 
 CURL *create_curl_handle(char *url, char **buff)

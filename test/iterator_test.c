@@ -2,6 +2,7 @@
 #include <string.h>
 #include "minunit.h"
 #include "../src/iterator.h"
+#include "../src/util.h"
 
 
 static void walk_test(void *item)
@@ -25,6 +26,12 @@ MU_TEST(test_iterator)
     Iterator *iterator = iterator_init((void *) items, 2);
     iterator_walk(iterator, walk_test);
 
+    int expected = 0;
+
+    iterator_walk_index(iterator, function(void, (void unused(*item), int i){
+        mu_assert_int_eq(expected++, i);
+    }));
+
     iterator_destroy(iterator);
 }
 
@@ -45,9 +52,9 @@ MU_TEST(test_iterator_map)
     items[1] = 3;
 
     Iterator *iterator = iterator_init((void *) items, 2);
-    Iterator *new = iterator_map(iterator, (IteratorMapCallback) map_int);
+    Iterator *new = iterator_map(iterator, (MapCallback) map_int);
 
-    iterator_walk(new, (IteratorWalkCallback) assert_mapped);
+    iterator_walk(new, (WalkCallback) assert_mapped);
 
     iterator_destroy(new);
 }

@@ -25,7 +25,11 @@ FieldAttributes *field_create_attributes(FieldType type)
 
 void field_destroy(FIELD *field)
 {
-    free(field_userptr(field));
+    FieldAttributes *attr = field_userptr(field);
+
+    if (attr) {
+        free(attr);
+    }
     free_field(field);
 }
 

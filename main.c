@@ -64,7 +64,6 @@ int main(void)
     int input;
     while ((input = getch()) != KEY_F(2)) {
         handle_input(input);
-
     }
     destroy();
 

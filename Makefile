@@ -1,12 +1,17 @@
 SOURCES = main.c $(shell find src -name '*.c') lib/*.c
 TEST_SOURCES = $(shell find src test -name '*.c' ! -name curl.c) lib/*.c
 
-compile = $(shell gcc -Wall -Wextra -g $1 -o $2 -lncurses -lmenu -lform -lcurl -lpcre -D _GNU_SOURCE)
+compile:
+	gcc -Wall -Wextra -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre -D _GNU_SOURCE
 
-run: $(call compile,$(SOURCES),client.o)
+asd: $(a)
+
+run:
+	make compile src="$(SOURCES)" out="client.o"
 	./client.o
 
-test: $(call compile,$(TEST_SOURCES) -D TEST,test.o)
+test:
+	make compile src="$(TEST_SOURCES) -D TEST" out="test.o"
 	./test.o
 
 test-valgrind:
