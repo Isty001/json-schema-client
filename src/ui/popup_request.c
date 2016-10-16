@@ -8,6 +8,7 @@
 #include "field.h"
 #include "../curl.h"
 #include "../href.h"
+#include "response.h"
 
 
 #define FIELD_CHARS_MIN 60
@@ -182,7 +183,7 @@ static void send_request(Link *link)
 
     save_form(link);
     destroy_request_popup();
-    ui_show_response(response);
+    response_show(response);
 }
 
 static void handle_input(Link *link)

@@ -4,6 +4,7 @@
 #include "ui.h"
 #include "list.h"
 #include "message.h"
+#include "response.h"
 
 
 #define DESCRIPTION_WIDTH full_width * 0.3
@@ -20,7 +21,7 @@ static void refresh_all(void)
     wrefresh(container);
     wrefresh(list);
     wrefresh(description);
-    wrefresh(response);
+    response_refresh();
     message_refresh();
 }
 
@@ -42,7 +43,10 @@ static void init_ncurses(void)
 
     noecho();
     cbreak();
+    clear();
     keypad(stdscr, TRUE);
+    mouseinterval(0);
+    mousemask(ALL_MOUSE_EVENTS, NULL);
 }
 
 void ui_init(void)
@@ -56,12 +60,15 @@ void ui_init(void)
     create_sub_windows();
     list_init(list);
     message_init_window(message);
+    response_init_window(response);
     refresh_all();
 }
 
 WINDOW *ui_sub_window(double height, double width, double y, double x)
 {
     WINDOW *sub_window = derwin(container, height, width, y, x);
+    scrollok(sub_window, true);
+
     assert(NULL != sub_window);
     box(sub_window, 0, 0);
 
@@ -97,7 +104,7 @@ void ui_destroy(void)
     delwin(list);
     delwin(description);
     delwin(response);
-//    delwin(message);
+    delwin(message);
     endwin();
 }
 
@@ -138,12 +145,4 @@ void ui_show_description(Link *link)
 
     box(description, 0, 0);
     wrefresh(description);
-}
-
-void ui_show_response(char *str)
-{
-    mvwprintw(response, PADDING, PADDING, str);
-    wrefresh(response);
-    refresh();
-    free(str);
 }

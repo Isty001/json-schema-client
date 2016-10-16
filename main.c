@@ -4,6 +4,7 @@
 #include "src/ui/list.h"
 #include "src/ui/popup.h"
 #include "src/ui/message.h"
+#include "src/ui/response.h"
 
 
 static void load_schemas(void)
@@ -28,12 +29,16 @@ static void destroy(void)
     storage_destroy();
     curl_destroy();
     schema_destroy();
+    response_destroy();
     ui_destroy();
 }
 
 static void handle_input(int input)
 {
     switch (input) {
+        case KEY_MOUSE:
+            response_scroll();
+            break;
         case KEY_RESIZE:
             ui_redraw();
         case KEY_DOWN:

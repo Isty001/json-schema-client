@@ -28,8 +28,6 @@ Popup *ui_popup_open(double height_rate, double width_rate);
 
 void ui_popup_close(void);
 
-void ui_show_response(char *response);
-
 void ui_show_description(Link *link);
 
 void ui_destroy(void);
