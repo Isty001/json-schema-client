@@ -5,16 +5,19 @@
 #include "util.h"
 #include "ui/field.h"
 #include "ui/popup.h"
+#include "href.h"
 
+
+#define dup_buffer(buff) strdup(remove_trailing_spaces(buff))
 
 #define BASE_REQ_FIELD_KEY "request.form.%s.field.%d"
 
-#define key_size(link) strlen(link->href) + strlen(BASE_REQ_FIELD_KEY) + 1
+#define key_size(link) strlen(link->url) + strlen(BASE_REQ_FIELD_KEY) + 1
 
 
-static void create_storage_key(char *key, Link *link, int field_offset)
+static void create_storage_key(char *key, Link *link, FieldAttributes *attr)
 {
-    sprintf(key, "request.form.%s.field.%d", link->href, field_offset);
+    sprintf(key, "request.form.%s.field.%s", link->url, attr->id);
 }
 
 void request_save_form(Iterator *fields, Link *link)
@@ -22,14 +25,16 @@ void request_save_form(Iterator *fields, Link *link)
     char *buffer;
     char key[key_size(link)];
 
-    iterator_walk(fields, (WalkCallback )function(void, (FIELD *field, int i) {
+    iterator_walk(fields, (WalkCallback )function(void, (FIELD *field) {
         buffer = field_read(field);
 
         if (buffer) {
-            create_storage_key(key, link, i);
+            create_storage_key(key, link, field_userptr(field));
             storage_set(key, buffer);
         }
     }));
+
+    storage_dump();
 }
 
 void request_load_form(Iterator *fields, Link *link)
@@ -37,13 +42,25 @@ void request_load_form(Iterator *fields, Link *link)
     char *buffer;
     char key[key_size(link)];
 
-    iterator_walk_index(fields, (WalkIndexCallback )function(void, (FIELD *field, int i) {
-        create_storage_key(key, link, i);
+    iterator_walk(fields, (WalkCallback )function(void, (FIELD *field) {
+        if (is_input(field)) {
+            create_storage_key(key, link, field_userptr(field));
 
-        if (is_input(field) && (buffer = storage_get(key))) {
-            set_field_buffer(field, 0, buffer);
+            if ((buffer = storage_get(key))) {
+                set_field_buffer(field, 0, buffer);
+            }
         }
     }));
+}
+
+static void append_query(Request *request, char *query)
+{
+    char *url = request->url;
+
+    asprintf(&url, "%s%s", url, remove_trailing_spaces(query));
+    free(request->url);
+
+    request->url = url;
 }
 
 static void apply_field_on_request(FIELD *field, Request *request)
@@ -58,18 +75,27 @@ static void apply_field_on_request(FIELD *field, Request *request)
 
     switch (attr->type) {
         case FIELD_HEADER:
-            request->headers = curl_slist_append(request->headers, buffer);
+            request->headers = curl_slist_append(request->headers, remove_trailing_spaces(buffer));
             break;
         case FIELD_DATA:
-            request->data = strdup(buffer);
+            request->data = dup_buffer(buffer);
             break;
         case FIELD_USER:
-            request->user = strdup(buffer);
+            request->user = dup_buffer(buffer);
             break;
         case FIELD_PASSWORD:
-            request->password = strdup(buffer);
+            request->password = dup_buffer(buffer);
+            break;
+        case FIELD_HREF:
+            href_replace(&request->url, attr->id, buffer);
+            break;
+        case FIELD_QUERY:
+            append_query(request, buffer);
             break;
     }
+#ifdef TEST
+    free(buffer);
+#endif
 }
 
 static Request *create_request(Link *link)

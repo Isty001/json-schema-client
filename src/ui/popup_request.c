@@ -1,11 +1,13 @@
 #include <form.h>
 #include <malloc.h>
+#include <string.h>
 #include "ui.h"
 #include "list.h"
 #include "popup.h"
 #include "../request.h"
 #include "field.h"
 #include "../curl.h"
+#include "../href.h"
 
 
 #define FIELD_CHARS_MIN 60
@@ -32,7 +34,6 @@ typedef struct
     Stack *fields;
     FORM *form;
     Popup *popup;
-    int field_offset;
     int field_width;
     Iterator *field_iterator;
 } RequestPopup;
@@ -46,7 +47,6 @@ static void init_request_popup(void)
     request_popup = malloc(sizeof(RequestPopup));
     request_popup->popup = ui_popup_open(0.75, 0.8);
     request_popup->fields = stack_init();
-    request_popup->field_offset = 0;
     request_popup->field_width = request_popup->popup->width * 0.47;
 }
 
@@ -71,31 +71,54 @@ static void add_label(char *text, int y, int x)
     stack_push(request_popup->fields, label);
 }
 
-static void add_field(int y, int x, int lines, FieldType type)
+static void add_field(int y, int x, int lines, FieldType type, char *id)
 {
     FIELD *field = create_field(y, x, lines);
 
     field_opts_off(field, O_AUTOSKIP);
     set_field_back(field, A_UNDERLINE);
-    set_field_userptr(field, field_create_attributes(type));
+    set_field_userptr(field, field_create_attributes(type, id));
 
     stack_push(request_popup->fields, field);
 }
 
-static void build_left_side(void)
+static void add_href_field(char **regex_matches)
+{
+    static int from = 28;
+
+    add_label(regex_matches[0], from += PADDING, PADDING);
+    add_field(from, strlen(regex_matches[0]) + PADDING, 1, FIELD_HREF, regex_matches[0]);
+}
+
+static void add_href_fields(Link *link)
+{
+    Iterator *arguments = href_arguments(link->href);
+
+    add_label("Href arguments: ", 26, PADDING);
+
+    iterator_walk(arguments, (WalkCallback) add_href_field);
+
+    iterator_destroy(arguments);
+}
+
+static void build_left_side(Link *link)
 {
     add_label("Headers: ", 2, PADDING);
 
-    add_field(4, PADDING, 1, FIELD_HEADER);
-    add_field(7, PADDING, 1, FIELD_HEADER);
-    add_field(10, PADDING, 1, FIELD_HEADER);
-    add_field(13, PADDING, 1, FIELD_HEADER);
-    add_field(16, PADDING, 1, FIELD_HEADER);
+    add_field(4, PADDING, 1, FIELD_HEADER, "header.1");
+    add_field(6, PADDING, 1, FIELD_HEADER, "header.2");
+    add_field(8, PADDING, 1, FIELD_HEADER, "header.3");
 
-    add_label("Basic auth: ", 20, PADDING);
+    add_label("Basic auth: ", 15, PADDING);
 
-    add_field(22, PADDING, 1, FIELD_USER);
-    add_field(25, PADDING, 1, FIELD_PASSWORD);
+    add_field(17, PADDING, 1, FIELD_USER, "user");
+    add_field(19, PADDING, 1, FIELD_PASSWORD, "password");
+
+    add_label("Query string: ", 21, PADDING);
+
+    add_field(23, PADDING, 1, FIELD_QUERY, "query");
+
+    add_href_fields(link);
 }
 
 static void build_right_side(void)
@@ -103,20 +126,22 @@ static void build_right_side(void)
     int y = request_popup->field_width + 2 * PADDING;
 
     add_label("Data:", 2, y);
-    add_field(4, y, 20, FIELD_DATA);
+    add_field(4, y, 20, FIELD_DATA, "data");
 }
 
-static void build_form(void)
+static void build_form(Link *link)
 {
-    build_left_side();
+    build_left_side(link);
     build_right_side();
-    request_popup->field_iterator = iterator_init((void *) request_popup->fields, request_popup->field_offset);
+    request_popup->field_iterator = iterator_init_from_stack(request_popup->fields);
+    stack_push(request_popup->fields, NULL);
 }
 
 static void create_form_window(void)
 {
     int rows, cols;
-    FORM *form = new_form((FIELD **)stack_items(request_popup->fields));
+
+    FORM *form = new_form((FIELD **) stack_to_array(request_popup->fields));
 
     scale_form(form, &rows, &cols);
     keypad(request_popup->popup->window, TRUE);
@@ -135,31 +160,32 @@ static void destroy_request_popup(void)
     unpost_form(request_popup->form);
     free_form(request_popup->form);
 
-    stack_destroy_callback(request_popup->fields, (Free) field_destroy);
+    stack_pop(request_popup->fields);
+    stack_destroy_callback(request_popup->fields, (Free) free_field);
 
-    free(request_popup->field_iterator);
+    iterator_destroy(request_popup->field_iterator);
     free(request_popup);
 }
 
-static void save_form(void)
+static void save_form(Link *link)
 {
-    request_save_form(request_popup->field_iterator, list_current_link());
+    request_save_form(request_popup->field_iterator, link);
 }
 
-static void send_request(void)
+static void send_request(Link *link)
 {
     char *response;
     Request *request;
 
-    request = request_create_from_form(request_popup->field_iterator, list_current_link());
+    request = request_create_from_form(request_popup->field_iterator, link);
     response = curl_send_request(request);
 
-    save_form();
+    save_form(link);
     destroy_request_popup();
     ui_show_response(response);
 }
 
-static void handle_input(void)
+static void handle_input(Link *link)
 {
     int ch;
     bool stop = false;
@@ -169,11 +195,9 @@ static void handle_input(void)
         ch = wgetch(request_popup->popup->window);
 
         switch (ch) {
-            on_input('\n', send_request();
-                    stop = true;)
-            on_input(KEY_F(4), save_form())
-            on_input(KEY_F(2), destroy_request_popup();
-                    stop = true)
+            on_input('\n', form_driver(form, REQ_VALIDATION); send_request(link); stop = true;)
+            on_input(KEY_F(4), form_driver(form, REQ_VALIDATION); save_form(link))
+            on_input(KEY_F(2), destroy_request_popup(); stop = true)
             on_input_form(KEY_DOWN, REQ_NEXT_LINE)
             on_input_form(KEY_UP, REQ_PREV_LINE)
             on_input_form(KEY_LEFT, REQ_PREV_CHAR)
@@ -194,19 +218,19 @@ static void handle_input(void)
 
 void popup_request(void)
 {
-    Link *current = list_current_link();
+    Link *link = list_current_link();
 
-    if (!current) {
+    if (!link) {
         return;
     }
 
     init_request_popup();
-    build_form();
+    build_form(link);
 
     request_load_form(request_popup->field_iterator, list_current_link());
 
     create_form_window();
     wrefresh(request_popup->popup->window);
 
-    handle_input();
+    handle_input(link);
 }

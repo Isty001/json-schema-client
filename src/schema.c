@@ -9,7 +9,7 @@
 #include "storage.h"
 
 
-#define BASE_LINK_storage_KEY "schema.links.%s"
+#define BASE_LINK_STORAGE_KEY "schema.%s.links"
 
 
 static Stack *schemas;
@@ -111,9 +111,9 @@ static char *load_json(char *url)
 
 static char *create_storage_key(char *name)
 {
-    char *key = malloc(strlen(BASE_LINK_storage_KEY) + strlen(name));
+    char *key = malloc(strlen(BASE_LINK_STORAGE_KEY) + strlen(name));
 
-    sprintf(key, BASE_LINK_storage_KEY, name);
+    sprintf(key, BASE_LINK_STORAGE_KEY, name);
 
     return key;
 }

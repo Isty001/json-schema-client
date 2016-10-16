@@ -3,14 +3,14 @@
 #include <malloc.h>
 #include "ui.h"
 #include "list.h"
-#include "../util.h"
+#include "message.h"
 
 
 #define DESCRIPTION_WIDTH full_width * 0.3
 
 
 static int full_height, full_width;
-static WINDOW *container, *list, *description, *message, *response;
+static WINDOW *container, *list, *description, *response, *message;
 static Popup *popup;
 
 
@@ -20,8 +20,8 @@ static void refresh_all(void)
     wrefresh(container);
     wrefresh(list);
     wrefresh(description);
-    wrefresh(message);
     wrefresh(response);
+    message_refresh();
 }
 
 static void create_sub_windows(void)
@@ -55,6 +55,7 @@ void ui_init(void)
 
     create_sub_windows();
     list_init(list);
+    message_init_window(message);
     refresh_all();
 }
 
@@ -95,8 +96,8 @@ void ui_destroy(void)
     delwin(container);
     delwin(list);
     delwin(description);
-    delwin(message);
     delwin(response);
+//    delwin(message);
     endwin();
 }
 

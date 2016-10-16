@@ -1,7 +1,7 @@
 #include <malloc.h>
 #include <stdlib.h>
+#include <form.h>
 #include "stack.h"
-#include "util.h"
 
 
 typedef struct item
@@ -94,7 +94,7 @@ void *stack_last(Stack *stack)
     return NULL;
 }
 
-void **stack_items(Stack *stack)
+void **stack_to_array(Stack *stack)
 {
     void **pointers = malloc(stack->count * sizeof(void *));
 
@@ -109,17 +109,28 @@ size_t stack_count(Stack *stack)
     return stack->count;
 }
 
+static void destroy_stack(Stack *stack)
+{
+    free(stack->items);
+    free(stack);
+}
+
 void stack_destroy(Stack *stack)
 {
-    stack_destroy_callback(stack, free);
+    for (int i = 0; i < stack->count; i++) {
+        free(stack->items[i]);
+    }
+    destroy_stack(stack);
 }
 
 void stack_destroy_callback(Stack *stack, Free callback)
 {
-    for (int i = 0; i < stack->count; i++) {
-        callback(stack->items[i]);
-    }
+    StackItem *item;
 
-    free(stack->items);
-    free(stack);
+    for (int i = 0; i < stack->count; i++) {
+        item = stack->items[i];
+        callback(item->ptr);
+        free(item);
+    }
+    destroy_stack(stack);
 }

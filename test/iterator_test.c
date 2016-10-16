@@ -51,7 +51,7 @@ MU_TEST(test_iterator_map)
     items[0] = 1;
     items[1] = 3;
 
-    Iterator *iterator = iterator_init(items, 2);
+    Iterator *iterator = iterator_init((void *)items, 2);
     Iterator *new = iterator_map(iterator, (MapCallback) map_int);
 
     iterator_walk(new, (WalkCallback) assert_mapped);

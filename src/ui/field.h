@@ -10,21 +10,24 @@
 
 typedef enum
 {
-    FIELD_HEADER = 0,
-    FIELD_USER = 1,
-    FIELD_PASSWORD = 3,
-    FIELD_DATA = 4
+    FIELD_HEADER,
+    FIELD_USER,
+    FIELD_PASSWORD,
+    FIELD_DATA,
+    FIELD_HREF,
+    FIELD_QUERY,
 } FieldType;
 
 typedef struct
 {
     FieldType type;
+    char *id;
 } FieldAttributes;
 
 
 char *field_read(FIELD *filed);
 
-FieldAttributes *field_create_attributes(FieldType type);
+FieldAttributes *field_create_attributes(FieldType type, char *str);
 
 void field_destroy(FIELD *field);
 

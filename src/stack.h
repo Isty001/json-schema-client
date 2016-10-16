@@ -23,7 +23,7 @@ bool stack_is_empty(Stack *stack);
 
 void *stack_last(Stack *stack);
 
-void **stack_items(Stack *stack);
+void **stack_to_array(Stack *stack);
 
 size_t stack_count(Stack *stack);
 

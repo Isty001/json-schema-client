@@ -39,6 +39,21 @@ MU_TEST(test_href)
     iterator_destroy(arguments);
 }
 
+MU_TEST(test_href_replace)
+{
+    char *url = malloc(30);
+    sprintf(url, "http://example.com/user/{id}");
+
+    char *placeholder = "{id}";
+    char *value = "12          ";
+
+    href_replace(&url, placeholder, value);
+
+    assert_string("http://example.com/user/12", url);
+
+    free(url);
+}
+
 void run_href_test(void)
 {
     puts("HREF TEST");
@@ -46,6 +61,7 @@ void run_href_test(void)
     MU_SUITE_CONFIGURE(href_setup, href_teardown);
 
     MU_RUN_TEST(test_href);
+    MU_RUN_TEST(test_href_replace);
 
     MU_REPORT();
 }

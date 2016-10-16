@@ -3,12 +3,13 @@
 #include "src/ui/ui.h"
 #include "src/ui/list.h"
 #include "src/ui/popup.h"
+#include "src/ui/message.h"
 
 
 static void load_schemas(void)
 {
-    schema_load("User", "./test/fixture/schema.json", NULL);
     schema_load("Post", "./test/fixture/schema2.json", "http://jsonplaceholder.typicode.com");
+    schema_load("Auth", "./test/fixture/auth_schema.json", "https://httpbin.org");
 }
 
 static void init(void)
@@ -17,6 +18,7 @@ static void init(void)
     curl_init();
     schema_init();
     load_schemas();
+    message_init();
     ui_init();
 }
 

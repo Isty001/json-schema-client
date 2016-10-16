@@ -34,5 +34,4 @@ void ui_show_description(Link *link);
 
 void ui_destroy(void);
 
-
 #endif

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pcre.h>
+#include <ctype.h>
 #include "href.h"
 
 
@@ -32,4 +33,22 @@ Iterator *href_arguments(char *href)
     pcre_free(pcre);
 
     return iterator_init_from_stack_destroy(found);
+}
+
+void href_replace(char **url, char *placeholder, char *value)
+{
+    if (is_string_empty(value)) {
+        return;
+    }
+
+    char buffer[4096];
+    char *p = strstr(*url, placeholder);
+
+    strncpy(buffer, *url, p - *url);
+    buffer[p - *url] = '\0';
+
+    sprintf(buffer + (p - *url), "%s%s", value, p + strlen(placeholder));
+
+    free(*url);
+    *url = strdup(remove_trailing_spaces(buffer));
 }

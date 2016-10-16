@@ -1,0 +1,9 @@
+{
+  "links": [
+    {
+      "rel": "login",
+      "method": "GET",
+      "href": "/basic-auth/user/passwd"
+    }
+  ]
+}

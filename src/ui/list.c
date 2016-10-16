@@ -59,6 +59,8 @@ static void create_items(Iterator *schemas)
 
         create_link_items(schema);
     }));
+
+    list->items[list->count] = NULL;
 }
 
 static void set_sides(void)
@@ -120,7 +122,7 @@ static void set_last_selected_item(int input)
 {
     int next = last_selected_offset + 1;
 
-    if (input == REQ_UP_ITEM && next >= 0) {
+    if (input == REQ_UP_ITEM && next >= 1) {
         last_selected_offset--;
     } else if (input == REQ_DOWN_ITEM && next <= (int)list->count) {
         last_selected_offset++;

@@ -7,6 +7,7 @@
 
 Iterator *href_arguments(char *href);
 
-char *href_fill(char *href, Iterator *arguments);
+void href_replace(char **url, char *placeholder, char *value);
+
 
 #endif

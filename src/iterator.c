@@ -20,7 +20,7 @@ Iterator *iterator_init(void **items, int count)
 
 Iterator *iterator_init_from_stack(Stack *stack)
 {
-    return iterator_init(stack_items(stack), stack_count(stack));
+    return iterator_init(stack_to_array(stack), stack_count(stack));
 }
 
 Iterator *iterator_init_from_stack_destroy(Stack *stack)

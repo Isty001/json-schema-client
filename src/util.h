@@ -23,6 +23,7 @@
 
 #define flag_exists(bitmask, flag) ((bitmask & flag) == flag)
 
+#define _free(x) if (NULL != x) free(x)
 
 typedef void (*Free)(void *);
 
@@ -34,5 +35,12 @@ char *json_prettify(char *json);
 
 bool is_string_empty(char *buffer);
 
+char *remove_trailing_spaces(char *buffer);
+
+
+static inline void print_int(int i)
+{
+    printf("%d\n", i);
+}
 
 #endif

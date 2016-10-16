@@ -11,19 +11,20 @@
 static FIELD *create_field(FieldType type)
 {
     FIELD *field = new_field(1, 10, 20, 10, 0, 0);
-    set_field_userptr(field, field_create_attributes(type));
+    set_field_userptr(field, field_create_attributes(type, NULL));
 
     return field;
 }
 
 static FIELD **create_fields(void)
 {
-    FIELD **fields = malloc(4 * sizeof(FIELD *));
+    FIELD **fields = malloc(5 * sizeof(FIELD *));
 
     fields[0] = create_field(FIELD_HEADER);
     fields[1] = create_field(FIELD_USER);
     fields[2] = create_field(FIELD_PASSWORD);
     fields[3] = create_field(FIELD_DATA);
+    fields[4] = create_field(FIELD_QUERY);
 
     return fields;
 }
@@ -35,7 +36,7 @@ MU_TEST(test_request_create)
     link->method = "PATCH";
 
     FIELD **fields = create_fields();
-    Iterator *iterator = iterator_init((void *) fields, 4);
+    Iterator *iterator = iterator_init((void *) fields, 5);
     Request *request = request_create_from_form(iterator, link);
 
     assert_string("test_buffer", request->headers->data);
@@ -43,9 +44,9 @@ MU_TEST(test_request_create)
     assert_string("test_buffer", request->user);
     assert_string("test_buffer", request->data);
     assert_string("PATCH", request->method);
-    assert_string("url", request->url);
+    assert_string("urltest_buffer", request->url);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         field_destroy(fields[i]);
     }
 

@@ -1,6 +1,7 @@
 #include <stdarg.h>
 #include <malloc.h>
 #include <ctype.h>
+#include <string.h>
 #include "util.h"
 #include "../lib/parson.h"
 
@@ -13,9 +14,7 @@ void free_multi(int count, ...)
     for (int i = 0; i < count; i++) {
         void *item = va_arg(items, void *);
 
-        if (NULL != item) {
-            free(item);
-        }
+        _free(item);
     }
 }
 
@@ -50,4 +49,16 @@ bool is_string_empty(char *buffer)
         buffer++;
     }
     return true;
+}
+
+char *remove_trailing_spaces(char *buffer)
+{
+    char *end = buffer + strlen(buffer) - 1;
+
+    while (end > buffer && isspace(*end)) {
+        end--;
+    }
+    *(end + 1) = '\0';
+
+    return buffer;
 }

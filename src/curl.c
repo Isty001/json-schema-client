@@ -5,7 +5,13 @@
 #include "curl.h"
 #include "request.h"
 #include "util.h"
+#include "ui/message.h"
 
+
+typedef struct {
+    char *content;
+    size_t size;
+} Buffer;
 
 void curl_init(void)
 {
@@ -17,14 +23,20 @@ void curl_destroy(void)
     curl_global_cleanup();
 }
 
-size_t write_callback(void *ptr, size_t unused(size), size_t unused(nmemb), char **s)
+size_t write_callback(void *content, size_t unused(size), size_t unused(nmemb), Buffer *buffer)
 {
-    *s = strdup(ptr);
+    size_t realsize = size * nmemb;
 
-    return strlen(*s);
+    buffer->content = realloc(buffer->content, buffer->size + realsize + 1);
+
+    memcpy(&(buffer->content[buffer->size]), content, realsize);
+    buffer->size += realsize;
+    buffer->content[buffer->size] = '\0';
+
+    return realsize;
 }
 
-CURL *create_curl_handle(char *url, char **buff)
+CURL *create_curl_handle(char *url, Buffer *buff)
 {
     CURL *curl = curl_easy_init();
 
@@ -39,13 +51,15 @@ CURL *create_curl_handle(char *url, char **buff)
 
 char *curl_get(char *url)
 {
-    char **buff = malloc(1);
+    Buffer buffer;
+    buffer.content = malloc(1);
+    buffer.size = 0;
 
-    CURL *curl = create_curl_handle(url, buff);
+    CURL *curl = create_curl_handle(url, &buffer);
     curl_easy_perform(curl);
     curl_easy_cleanup(curl);
 
-    return *buff;
+    return buffer.content;
 }
 
 static void set_authentication(Request *request, CURL *curl)
@@ -78,20 +92,35 @@ static void set_headers(Request *request, CURL *curl)
     }
 }
 
+static void perform(CURL *curl)
+{
+    CURLcode code = curl_easy_perform(curl);
+    char *msg = (char *)curl_easy_strerror(code);
+
+    if (CURLE_OK == code) {
+        message_success(msg);
+    } else {
+        message_error(msg);
+    }
+}
+
 char *curl_send_request(Request *request)
 {
-    char **buff = malloc(1);
-    CURL *curl = create_curl_handle(request->url, buff);
+    Buffer buffer;
+    buffer.content = malloc(1);
+    buffer.size = 0;
+
+    CURL *curl = create_curl_handle(request->url, &buffer);
 
     set_authentication(request, curl);
     set_method(request, curl);
     set_data(request, curl);
     set_headers(request, curl);
 
-    curl_easy_perform(curl);
+    perform(curl);
     curl_easy_cleanup(curl);
 
     request_destroy(request);
 
-    return *buff;
+    return buffer.content;
 }
