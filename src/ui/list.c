@@ -75,7 +75,7 @@ static void create_list(WINDOW *window, Iterator *schemas)
     list->currently_built = 0;
     list->window = window;
     list->count = iterator_count(schemas) + schema_count_links();
-    list->items = calloc(1, list->count * sizeof(ITEM *));
+    list->items = malloc(list->count * sizeof(ITEM));
 }
 
 void list_init(WINDOW *window)

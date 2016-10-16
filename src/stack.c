@@ -111,8 +111,13 @@ size_t stack_count(Stack *stack)
 
 void stack_destroy(Stack *stack)
 {
+    stack_destroy_callback(stack, free);
+}
+
+void stack_destroy_callback(Stack *stack, Free callback)
+{
     for (int i = 0; i < stack->count; i++) {
-        free(stack->items[i]);
+        callback(stack->items[i]);
     }
 
     free(stack->items);

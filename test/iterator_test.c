@@ -19,7 +19,7 @@ static void walk_test(void *item)
 
 MU_TEST(test_iterator)
 {
-    char **items = malloc(10);
+    char **items = malloc(16);
     items[0] = "12345";
     items[1] = "67890";
 
@@ -35,14 +35,14 @@ MU_TEST(test_iterator)
     iterator_destroy(iterator);
 }
 
-static int map_int(int i)
+static int map_int(int n)
 {
-    return ++i;
+    return ++n;
 }
 
 static void assert_mapped(int i)
 {
-    mu_assert(0 == i % 2, "Invalid item in mapped Iterator");
+    mu_assert(0 == (i % 2), "Invalid item in mapped Iterator");
 }
 
 MU_TEST(test_iterator_map)
@@ -51,7 +51,7 @@ MU_TEST(test_iterator_map)
     items[0] = 1;
     items[1] = 3;
 
-    Iterator *iterator = iterator_init((void *) items, 2);
+    Iterator *iterator = iterator_init(items, 2);
     Iterator *new = iterator_map(iterator, (MapCallback) map_int);
 
     iterator_walk(new, (WalkCallback) assert_mapped);

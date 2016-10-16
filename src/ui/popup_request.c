@@ -1,6 +1,5 @@
 #include <form.h>
 #include <malloc.h>
-#include <stdlib.h>
 #include "ui.h"
 #include "list.h"
 #include "popup.h"
@@ -30,7 +29,7 @@
 
 typedef struct
 {
-    FIELD *fields[REQ_FIELD_COUNT];
+    Stack *fields;
     FORM *form;
     Popup *popup;
     int field_offset;
@@ -46,6 +45,7 @@ static void init_request_popup(void)
 {
     request_popup = malloc(sizeof(RequestPopup));
     request_popup->popup = ui_popup_open(0.75, 0.8);
+    request_popup->fields = stack_init();
     request_popup->field_offset = 0;
     request_popup->field_width = request_popup->popup->width * 0.47;
 }
@@ -68,7 +68,7 @@ static void add_label(char *text, int y, int x)
     field_opts_off(label, O_ACTIVE);
     set_field_buffer(label, 0, text);
 
-    request_popup->fields[request_popup->field_offset++] = label;
+    stack_push(request_popup->fields, label);
 }
 
 static void add_field(int y, int x, int lines, FieldType type)
@@ -79,7 +79,7 @@ static void add_field(int y, int x, int lines, FieldType type)
     set_field_back(field, A_UNDERLINE);
     set_field_userptr(field, field_create_attributes(type));
 
-    request_popup->fields[request_popup->field_offset++] = field;
+    stack_push(request_popup->fields, field);
 }
 
 static void build_left_side(void)
@@ -110,14 +110,13 @@ static void build_form(void)
 {
     build_left_side();
     build_right_side();
-    request_popup->fields[request_popup->field_offset] = NULL;
     request_popup->field_iterator = iterator_init((void *) request_popup->fields, request_popup->field_offset);
 }
 
 static void create_form_window(void)
 {
     int rows, cols;
-    FORM *form = new_form(request_popup->fields);
+    FORM *form = new_form((FIELD **)stack_items(request_popup->fields));
 
     scale_form(form, &rows, &cols);
     keypad(request_popup->popup->window, TRUE);
@@ -136,9 +135,7 @@ static void destroy_request_popup(void)
     unpost_form(request_popup->form);
     free_form(request_popup->form);
 
-    for (int i = 0; i < request_popup->field_offset; i++) {
-        field_destroy(request_popup->fields[i]);
-    }
+    stack_destroy_callback(request_popup->fields, (Free) field_destroy);
 
     free(request_popup->field_iterator);
     free(request_popup);

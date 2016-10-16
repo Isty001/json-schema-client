@@ -3,6 +3,7 @@
 
 
 #include <stdbool.h>
+#include "util.h"
 
 
 typedef struct stack Stack;
@@ -28,5 +29,6 @@ size_t stack_count(Stack *stack);
 
 void stack_destroy(Stack *stack);
 
+void stack_destroy_callback(Stack *stack, Free callback);
 
 #endif
