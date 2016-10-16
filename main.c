@@ -36,8 +36,9 @@ static void destroy(void)
 static void handle_input(int input)
 {
     switch (input) {
-        case KEY_MOUSE:
-            response_scroll();
+        case 'k':
+        case 'l':
+            response_scroll(input);
             break;
         case KEY_RESIZE:
             ui_redraw();

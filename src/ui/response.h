@@ -11,7 +11,7 @@ void response_refresh(void);
 
 void response_show(char *response);
 
-void response_scroll(void);
+void response_scroll(int input);
 
 void response_destroy(void);
 

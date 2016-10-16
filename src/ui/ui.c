@@ -45,8 +45,6 @@ static void init_ncurses(void)
     cbreak();
     clear();
     keypad(stdscr, TRUE);
-    mouseinterval(0);
-    mousemask(ALL_MOUSE_EVENTS, NULL);
 }
 
 void ui_init(void)

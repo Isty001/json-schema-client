@@ -1,4 +1,5 @@
 #include <string.h>
+#include <ncurses.h>
 #include "response.h"
 #include "ui.h"
 
@@ -64,20 +65,16 @@ void response_show(char *str)
     response_refresh();
 }
 
-void response_scroll(void)
+void response_scroll(int input)
 {
-    MEVENT event;
-
-    if (getmouse(&event) == OK) {
-        if (event.bstate & BUTTON4_PRESSED) {
-            wscrl(window, -SCROLL_SPEED);
-            first_line -= SCROLL_SPEED;
-            last_line -= SCROLL_SPEED;
-        } else if (event.bstate & BUTTON5_PRESSED) {
-            first_line += SCROLL_SPEED;
-            last_line += SCROLL_SPEED;
-            wscrl(window, SCROLL_SPEED);
-        }
+    if (input == 'k') {
+        wscrl(window, -SCROLL_SPEED);
+        first_line -= SCROLL_SPEED;
+        last_line -= SCROLL_SPEED;
+    } else if (input == 'l') {
+        first_line += SCROLL_SPEED;
+        last_line += SCROLL_SPEED;
+        wscrl(window, SCROLL_SPEED);
     }
 
     response_refresh();
