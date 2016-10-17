@@ -9,7 +9,7 @@ run:
 	./client.o
 
 compile:
-	gcc -Wall -Wextra -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre -D _GNU_SOURCE
+	gcc -Wall -Wextra -std=gnu11 -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre -D _GNU_SOURCE
 
 test:
 	make compile src="$(TEST_SOURCES) -D TEST" out="test.o"
