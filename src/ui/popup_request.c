@@ -1,6 +1,7 @@
 #include <form.h>
 #include <malloc.h>
 #include <string.h>
+#include <pcre.h>
 #include "ui.h"
 #include "list.h"
 #include "popup.h"
@@ -84,21 +85,22 @@ static void add_field(int y, int x, int lines, FieldType type, char *id)
     stack_push(request_popup->fields, field);
 }
 
-static void add_href_field(char **regex_matches)
+static void add_href_field(char **regex_matches, int y)
 {
-    static int from = 18;
-
-    add_label(regex_matches[0], from += PADDING, PADDING);
-    add_field(from, strlen(regex_matches[0]) + PADDING, 1, FIELD_HREF, regex_matches[0]);
+    add_label(regex_matches[0], y, PADDING);
+    add_field(y, strlen(regex_matches[0]) + PADDING, 1, FIELD_HREF, regex_matches[0]);
+    pcre_free_substring_list((const char **)regex_matches);
 }
 
-static void add_href_fields(Link *link)
+static void add_href_fields(Link *link, int y)
 {
     Iterator *arguments = href_arguments(link->href);
 
-    add_label("Href arguments: ", 18, PADDING);
+    add_label("Href arguments: ", y, PADDING);
 
-    iterator_walk(arguments, (WalkCallback) add_href_field);
+    iterator_walk(arguments, (WalkCallback) function(void, (char **matches){
+        add_href_field(matches, ++y);
+    }));
 
     iterator_destroy(arguments);
 }
@@ -120,7 +122,7 @@ static void build_left_side(Link *link)
 
     add_field(16, PADDING, 1, FIELD_QUERY, "query");
 
-    add_href_fields(link);
+    add_href_fields(link, 18);
 }
 
 static void build_right_side(void)

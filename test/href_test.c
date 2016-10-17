@@ -9,7 +9,7 @@ static char **expected;
 
 static void href_setup(void)
 {
-    expected = malloc(12);
+    expected = malloc(2 * sizeof(char *));
     expected[0] = "{id}";
     expected[1] = "{location}";
 }

@@ -1,8 +1,8 @@
 #include <malloc.h>
 #include <string.h>
-#include "minunit.h"
 #include "../src/iterator.h"
 #include "../src/util.h"
+#include "unit_test.h"
 
 
 static void walk_test(void *item)
@@ -35,19 +35,19 @@ MU_TEST(test_iterator)
     iterator_destroy(iterator);
 }
 
-static int map_int(int n)
+static int map_int(int i)
 {
-    return ++n;
+    return i * 10;
 }
 
-static void assert_mapped(int i)
+static void assert_mapped(int new)
 {
-    mu_assert(0 == (i % 2), "Invalid item in mapped Iterator");
+    mu_assert(0 == (new % 10), "Invalid item in mapped Iterator");
 }
 
 MU_TEST(test_iterator_map)
 {
-    int *items = malloc(3 * sizeof(int));
+    int *items = malloc(2 * sizeof(int *));
     items[0] = 1;
     items[1] = 3;
 
