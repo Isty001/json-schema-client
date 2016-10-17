@@ -40,6 +40,7 @@ void message_refresh(void)
 
 static void update_message(char *msg, int col)
 {
+    _free(message);
     color = col;
     message = msg;
     message_refresh();

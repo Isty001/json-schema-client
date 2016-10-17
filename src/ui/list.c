@@ -28,7 +28,7 @@ static void setup_list_menu(void)
     list->menu = new_menu(list->items);
 
     set_menu_win(list->menu, list->window);
-    set_menu_sub(list->menu, derwin(list->window, list->height, list->width, 2, 2));
+    set_menu_sub(list->menu, derwin(list->window, list->height, list->width, 1, 1));
     set_menu_format(list->menu, list->height, 1);
 
     post_menu(list->menu);

@@ -45,7 +45,7 @@ MU_TEST(test_href_replace)
     sprintf(url, "http://example.com/user/{id}");
 
     char *placeholder = "{id}";
-    char *value = "12          ";
+    char *value = "12";
 
     href_replace(&url, placeholder, value);
 

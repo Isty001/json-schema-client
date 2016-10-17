@@ -11,7 +11,9 @@
 #include "response.h"
 
 
-#define FIELD_CHARS_MIN 60
+#define FIELD_CHARS_MIN 80
+
+#define FIELD_WIDTH request_popup->popup->width * 0.47
 
 
 #define on_input(key, action) \
@@ -35,7 +37,6 @@ typedef struct
     Stack *fields;
     FORM *form;
     Popup *popup;
-    int field_width;
     Iterator *field_iterator;
 } RequestPopup;
 
@@ -46,20 +47,20 @@ static RequestPopup *request_popup;
 static void init_request_popup(void)
 {
     request_popup = malloc(sizeof(RequestPopup));
-    request_popup->popup = ui_popup_open(0.75, 0.8);
+    request_popup->popup = ui_popup_open(0.85, 0.8);
     request_popup->fields = stack_init();
-    request_popup->field_width = request_popup->popup->width * 0.47;
 }
 
 static FIELD *create_field(int y, int x, int lines)
 {
     int off_screen = 0;
+    int width = FIELD_WIDTH - PADDING;
 
-    if (request_popup->field_width < FIELD_CHARS_MIN) {
-        off_screen = FIELD_CHARS_MIN - request_popup->field_width;
+    if (width < FIELD_CHARS_MIN) {
+        off_screen = FIELD_CHARS_MIN - width;
     }
 
-    return new_field(lines, request_popup->field_width, y, x, off_screen, 0);
+    return new_field(lines, width, y, x, off_screen, 0);
 }
 
 static void add_label(char *text, int y, int x)
@@ -85,7 +86,7 @@ static void add_field(int y, int x, int lines, FieldType type, char *id)
 
 static void add_href_field(char **regex_matches)
 {
-    static int from = 28;
+    static int from = 18;
 
     add_label(regex_matches[0], from += PADDING, PADDING);
     add_field(from, strlen(regex_matches[0]) + PADDING, 1, FIELD_HREF, regex_matches[0]);
@@ -95,7 +96,7 @@ static void add_href_fields(Link *link)
 {
     Iterator *arguments = href_arguments(link->href);
 
-    add_label("Href arguments: ", 26, PADDING);
+    add_label("Href arguments: ", 18, PADDING);
 
     iterator_walk(arguments, (WalkCallback) add_href_field);
 
@@ -107,27 +108,27 @@ static void build_left_side(Link *link)
     add_label("Headers: ", 2, PADDING);
 
     add_field(4, PADDING, 1, FIELD_HEADER, "header.1");
-    add_field(6, PADDING, 1, FIELD_HEADER, "header.2");
-    add_field(8, PADDING, 1, FIELD_HEADER, "header.3");
+    add_field(5, PADDING, 1, FIELD_HEADER, "header.2");
+    add_field(6, PADDING, 1, FIELD_HEADER, "header.3");
 
-    add_label("Basic auth: ", 15, PADDING);
+    add_label("Basic auth: ", 8, PADDING);
 
-    add_field(17, PADDING, 1, FIELD_USER, "user");
-    add_field(19, PADDING, 1, FIELD_PASSWORD, "password");
+    add_field(10, PADDING, 1, FIELD_USER, "user");
+    add_field(11, PADDING, 1, FIELD_PASSWORD, "password");
 
-    add_label("Query string: ", 21, PADDING);
+    add_label("Query string: ", 14, PADDING);
 
-    add_field(23, PADDING, 1, FIELD_QUERY, "query");
+    add_field(16, PADDING, 1, FIELD_QUERY, "query");
 
     add_href_fields(link);
 }
 
 static void build_right_side(void)
 {
-    int y = request_popup->field_width + 2 * PADDING;
+    int x = FIELD_WIDTH + PADDING;
 
-    add_label("Data:", 2, y);
-    add_field(4, y, 20, FIELD_DATA, "data");
+    add_label("Data:", PADDING, x);
+    add_field(PADDING * 2, x, 20, FIELD_DATA, "data");
 }
 
 static void build_form(Link *link)
@@ -204,6 +205,7 @@ static void handle_input(Link *link)
             on_input_form(KEY_LEFT, REQ_PREV_CHAR)
             on_input_form(KEY_RIGHT, REQ_NEXT_CHAR)
             on_input_form(127, REQ_DEL_PREV)
+            on_input_form(KEY_BACKSPACE, REQ_DEL_PREV)
             on_input_form(KEY_DC, REQ_DEL_CHAR)
             on_input_form(KEY_HOME, REQ_BEG_LINE)
             on_input_form(KEY_END, REQ_END_LINE)

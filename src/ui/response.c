@@ -4,7 +4,7 @@
 #include "ui.h"
 
 
-#define SCROLL_SPEED 2
+#define SCROLL_SPEED 4
 
 
 static WINDOW *window;
@@ -59,22 +59,41 @@ void response_refresh(void)
 
 void response_show(char *str)
 {
+    if (!str) {
+        return;
+    }
+
     _free(response);
     first_line = 0;
-    response = strdup(str);
+
+    char *pretty = json_prettify(str);
+
+    response = pretty ? pretty : str;
     response_refresh();
+}
+
+void scroll_down(void)
+{
+    if (last_line != height) {
+        wscrl(window, -SCROLL_SPEED);
+        first_line -= SCROLL_SPEED;
+        last_line -= SCROLL_SPEED;
+    }
+}
+
+void scroll_up(void)
+{
+    first_line += SCROLL_SPEED;
+    last_line += SCROLL_SPEED;
+    wscrl(window, SCROLL_SPEED);
 }
 
 void response_scroll(int input)
 {
     if (input == 'k') {
-        wscrl(window, -SCROLL_SPEED);
-        first_line -= SCROLL_SPEED;
-        last_line -= SCROLL_SPEED;
+        scroll_down();
     } else if (input == 'l') {
-        first_line += SCROLL_SPEED;
-        last_line += SCROLL_SPEED;
-        wscrl(window, SCROLL_SPEED);
+        scroll_up();
     }
 
     response_refresh();

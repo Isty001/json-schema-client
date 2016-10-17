@@ -87,7 +87,7 @@ static void apply_field_on_request(FIELD *field, Request *request)
             request->password = dup_buffer(buffer);
             break;
         case FIELD_HREF:
-            href_replace(&request->url, attr->id, buffer);
+            href_replace(&request->url, attr->id, remove_trailing_spaces(buffer));
             break;
         case FIELD_QUERY:
             append_query(request, buffer);

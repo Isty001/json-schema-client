@@ -87,7 +87,7 @@ static void set_data(Request *request, CURL *curl)
 
 static void set_headers(Request *request, CURL *curl)
 {
-    if (request->data) {
+    if (request->headers) {
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, request->headers);
     }
 }
@@ -96,6 +96,10 @@ static void perform(CURL *curl)
 {
     CURLcode code = curl_easy_perform(curl);
     char *msg = (char *)curl_easy_strerror(code);
+    int status;
+
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+    asprintf(&msg, "%s Status: %d", msg, status);
 
     if (CURLE_OK == code) {
         message_success(msg);

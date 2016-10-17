@@ -50,5 +50,5 @@ void href_replace(char **url, char *placeholder, char *value)
     sprintf(buffer + (p - *url), "%s%s", value, p + strlen(placeholder));
 
     free(*url);
-    *url = strdup(remove_trailing_spaces(buffer));
+    *url = strdup(buffer);
 }
