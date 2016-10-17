@@ -10,9 +10,8 @@
 
 static void load_schemas(void)
 {
-//    schema_load("Post", "./test/fixture/schema2.json", "http://jsonplaceholder.typicode.com");
-//    schema_load("Auth", "./test/fixture/auth_schema.json", "https://httpbin.org");
-    LOAD_SCHEMAS;
+    schema_load("Post", "./test/fixture/schema2.json", "http://jsonplaceholder.typicode.com");
+    schema_load("Auth", "./test/fixture/auth_schema.json", "https://httpbin.org");
 }
 
 static void init(void)
