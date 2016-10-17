@@ -17,6 +17,6 @@ test:
 
 test-valgrind:
 	make test
-	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./test.o
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=definite,indirect,possible,reachable ./test.o
 
 .PHONY: test
