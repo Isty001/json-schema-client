@@ -32,6 +32,7 @@ char *json_prettify(char *json)
     JSON_Value *parsed = json_parse_string(json);
     char *buffer = json_serialize_to_string_pretty(parsed);
     json_value_free(parsed);
+    buffer[strlen(buffer)] = '\0';
 
     return buffer;
 }

@@ -5,7 +5,6 @@
 #include "src/ui/popup.h"
 #include "src/ui/message.h"
 #include "src/ui/response.h"
-#include "sandbox/schema_list.h"
 
 
 static void load_schemas(void)

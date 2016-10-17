@@ -47,7 +47,7 @@ static RequestPopup *request_popup;
 static void init_request_popup(void)
 {
     request_popup = malloc(sizeof(RequestPopup));
-    request_popup->popup = ui_popup_open(0.85, 0.8);
+    request_popup->popup = ui_popup_open(0.85, 0.95);
     request_popup->fields = stack_init();
 }
 
