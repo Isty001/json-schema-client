@@ -25,6 +25,9 @@
 
 #define _free(x) if (NULL != x) free(x)
 
+#define dup_buffer(buff) strdup(remove_trailing_spaces(buff))
+
+
 typedef void (*Free)(void *);
 
 void free_multi(int count, ...);

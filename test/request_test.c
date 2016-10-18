@@ -6,6 +6,9 @@
 #include "../src/request.h"
 #include "../src/util.h"
 #include "../src/schema.h"
+#include "../src/ui/request_fields.h"
+#include "../src/storage.h"
+#include "../src/ui/request_field_storage.h"
 
 
 static FIELD *create_field(FieldType type)
@@ -29,6 +32,11 @@ static FIELD **create_fields(void)
     return fields;
 }
 
+static char *test_field_read(FIELD unused(*field))
+{
+    return strdup("test_buffer");
+}
+
 MU_TEST(test_request_create)
 {
     Link *link = malloc(sizeof(Link));
@@ -37,7 +45,7 @@ MU_TEST(test_request_create)
 
     FIELD **fields = create_fields();
     Iterator *iterator = iterator_init((void *) fields, 5);
-    Request *request = request_create_from_form(iterator, link);
+    Request *request = request_create_from_fields(iterator, link, test_field_read);
 
     assert_string("test_buffer", request->headers->data);
     assert_string("test_buffer", request->password);

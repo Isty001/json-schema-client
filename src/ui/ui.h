@@ -30,6 +30,8 @@ void ui_popup_close(void);
 
 void ui_show_description(Link *link);
 
+WINDOW *ui_container(void);
+
 void ui_destroy(void);
 
 #endif

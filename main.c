@@ -33,6 +33,20 @@ static void destroy(void)
     ui_destroy();
 }
 
+static void send_hidden_form()
+{
+    Link *link = list_current_link();
+
+    if (!link) {
+        return;
+    }
+
+    Request *request = request_create_from_hidden_form(link);
+    char *response = curl_send_request(request);
+
+    response_show(response);
+}
+
 static void handle_input(int input)
 {
     switch (input) {
@@ -50,17 +64,14 @@ static void handle_input(int input)
             list_event(REQ_UP_ITEM);
             list_show_description();
             break;
-        case KEY_NPAGE:
-            list_event(REQ_SCR_DPAGE);
-            break;
-        case KEY_PPAGE:
-            list_event(REQ_SCR_UPAGE);
-            break;
         case 'h':
-            popup_help();
+            help_popup();
             break;
         case 'e':
-            popup_request();
+            request_popup();
+            break;
+        case '\n':
+            send_hidden_form();
             break;
     }
 }
@@ -70,7 +81,7 @@ int main(void)
     init();
 
     int input;
-    while ((input = getch()) != KEY_F(2)) {
+    while ((input = wgetch(ui_container())) != KEY_F(2)) {
         handle_input(input);
     }
     destroy();

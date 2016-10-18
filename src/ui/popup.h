@@ -2,9 +2,9 @@
 #define API_TEST_POPUP_FACTORY_H
 
 
-void popup_help(void);
+void help_popup(void);
 
-void popup_request(void);
+void request_popup(void);
 
 
 #endif

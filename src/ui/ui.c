@@ -7,9 +7,6 @@
 #include "response.h"
 
 
-#define DESCRIPTION_WIDTH full_width * 0.3
-
-
 static int full_height, full_width;
 static WINDOW *container, *list, *description, *response, *message;
 static Popup *popup;
@@ -21,14 +18,14 @@ static void refresh_all(void)
     wrefresh(container);
     wrefresh(list);
     wrefresh(description);
-    response_refresh();
     message_refresh();
+    response_refresh();
 }
 
 static void create_sub_windows(void)
 {
     list = ui_sub_window(full_height * 0.4, full_width * 0.3, 0, 0);
-    description = ui_sub_window(full_height * 0.6, DESCRIPTION_WIDTH, full_height * 0.4, 0);
+    description = ui_sub_window(full_height * 0.6, full_width * 0.3, full_height * 0.4, 0);
 
     message = ui_sub_window(full_height * 0.1, full_width * 0.7, 0, full_width * 0.3);
     response = ui_sub_window(full_height * 0.9, full_width * 0.7, full_height * 0.1, full_width * 0.3);
@@ -44,7 +41,6 @@ static void init_ncurses(void)
     noecho();
     cbreak();
     clear();
-    keypad(stdscr, TRUE);
 }
 
 void ui_init(void)
@@ -52,13 +48,15 @@ void ui_init(void)
     init_ncurses();
 
     container = newwin(full_height, full_width, 0, 0);
+    keypad(container, TRUE);
     box(container, 0, 0);
     assert(NULL != container);
 
     create_sub_windows();
-    list_init(list);
-    message_init_window(message);
+
     response_init_window(response);
+    message_init_window(message);
+    list_init(list);
     refresh_all();
 }
 
@@ -143,4 +141,9 @@ void ui_show_description(Link *link)
 
     box(description, 0, 0);
     wrefresh(description);
+}
+
+WINDOW *ui_container(void)
+{
+    return container;
 }

@@ -1,5 +1,6 @@
 #include <string.h>
 #include <ncurses.h>
+#include <assert.h>
 #include "response.h"
 #include "ui.h"
 
@@ -42,7 +43,7 @@ void response_refresh(void)
     }
     wclear(window);
 
-    int i = 0, y = PADDING;
+    int i = 0, y = PADDING / 2;
     size_t size = strlen(response);
     char *line, buff[size];
 

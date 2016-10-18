@@ -17,12 +17,13 @@ typedef struct
     char *url;
 } Request;
 
+/** For testability */
+typedef char *(*FieldReader)(FIELD *field);
 
-void request_save_form(Iterator *fields, Link *link);
 
-void request_load_form(Iterator *fields, Link *link);
+Request *request_create_from_fields(Iterator *fields, Link *link, FieldReader reader);
 
-Request *request_create_from_form(Iterator *fields, Link *link);
+Request *request_create_from_hidden_form(Link *link);
 
 void request_destroy(Request *request);
 

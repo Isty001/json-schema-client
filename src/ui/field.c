@@ -5,9 +5,6 @@
 
 char *field_read(FIELD *field)
 {
-#ifdef TEST
-    return strdup("test_buffer");
-#endif
     char *buffer = field_buffer(field, 0);
 
     if (is_input(field) && !is_string_empty(buffer)) {
