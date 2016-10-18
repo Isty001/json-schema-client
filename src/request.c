@@ -17,7 +17,7 @@
 
 static void create_storage_key(char *key, Link *link, FieldAttributes *attr)
 {
-    sprintf(key, "request.form.%s.field.%s", link->url, attr->id);
+    sprintf(key, "request.form.%s.%s.field.%s", link->method, link->url, attr->id);
 }
 
 void request_save_form(Iterator *fields, Link *link)
