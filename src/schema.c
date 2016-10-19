@@ -2,10 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "curl.h"
-#include "stack.h"
-#include "schema.h"
 #include "../lib/parson.h"
-#include "util.h"
 #include "storage.h"
 
 
@@ -22,11 +19,6 @@ static char *object_get(JSON_Object *obj, char *key)
     }
 
     return NULL;
-}
-
-static void destroy_link(Link *link)
-{
-    free_multi(8, link->href, link->method, link->rel, link->description, link->title, link->display, link->url, link);
 }
 
 static void set_link_url(Link *link, char *api_url)
@@ -63,10 +55,12 @@ static Link *create_link(JSON_Object *link_schema, char *api_url)
     return link;
 }
 
-static Schema *create_schema(char *name, Stack *links)
+static Schema *create_schema(char *name, char *url, char *api_url, Stack *links)
 {
     Schema *schema = malloc(sizeof(Schema));
     schema->name = strdup(name);
+    schema->url = strdup(url);
+    schema->api_url = api_url ? strdup(api_url) : NULL;
     schema->links = iterator_init_from_stack_destroy(links);
 
     return schema;
@@ -129,7 +123,7 @@ static void load_links_from_url(char *url, char *api_url, Stack *link_stack, cha
     char *json = load_json(url);
 
     JSON_Value *schema_root = json_parse_string(json);
-    JSON_Object *schema = json_value_get_object(schema_root);
+    JSON_Object *schema = json_object(schema_root);
     JSON_Value *links_root = json_object_get_value(schema, "links");
     JSON_Array *links = json_value_get_array(links_root);
     char *serialized = json_serialize_to_string(links_root);
@@ -160,7 +154,7 @@ void schema_load(char *name, char *url, char *api_url)
     }
 
     free(storage_key);
-    stack_push(schemas, create_schema(name, link_stack));
+    stack_push(schemas, create_schema(name, url, api_url, link_stack));
 }
 
 Iterator *schema_iterator(void)
@@ -178,13 +172,21 @@ void schema_init(void)
     schemas = stack_init();
 }
 
-void destroy_schema(Schema *schema)
+static void destroy_link(Link *link)
+{
+    free_multi(8, link->href, link->method, link->rel, link->description, link->title, link->display, link->url, link);
+}
+
+static void destroy_schema(Schema *schema)
 {
     iterator_walk(schema->links, (Free) destroy_link);
     iterator_destroy(schema->links);
 
-    free(schema->name);
-    free(schema);
+    if (schema->api_url) {
+        free(schema->api_url);
+    }
+
+    free_multi(3, schema->name, schema->url, schema);
 }
 
 void schema_destroy(void)

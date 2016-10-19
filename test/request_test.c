@@ -14,7 +14,7 @@
 static FIELD *create_field(FieldType type)
 {
     FIELD *field = new_field(1, 10, 20, 10, 0, 0);
-    set_field_userptr(field, field_create_attributes(type, NULL));
+    set_field_userptr(field, field_attributes_create(type, NULL));
 
     return field;
 }

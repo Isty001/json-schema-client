@@ -5,30 +5,26 @@
 #include "src/ui/popup.h"
 #include "src/ui/message.h"
 #include "src/ui/response.h"
+#include "src/schema_storage.h"
 
-
-static void load_schemas(void)
-{
-    schema_load("Post", "./test/fixture/schema2.json", "http://jsonplaceholder.typicode.com");
-    schema_load("Auth", "./test/fixture/auth_schema.json", "https://httpbin.org");
-}
 
 static void init(void)
 {
     storage_init("./storage");
     curl_init();
     schema_init();
-    load_schemas();
+    schema_storage_unserialize();
     message_init();
     ui_init();
 }
 
 static void destroy(void)
 {
+    curl_destroy();
+    schema_storage_serialize();
+    schema_destroy();
     storage_dump();
     storage_destroy();
-    curl_destroy();
-    schema_destroy();
     response_destroy();
     ui_destroy();
 }
@@ -66,6 +62,9 @@ static void handle_input(int input)
             break;
         case 'h':
             help_popup();
+            break;
+        case 's':
+            schema_popup();
             break;
         case 'e':
             request_popup();

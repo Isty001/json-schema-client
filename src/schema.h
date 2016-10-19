@@ -19,6 +19,8 @@ typedef struct
 typedef struct
 {
     char *name;
+    char *url;
+    char *api_url;
     Iterator *links;
 } Schema;
 

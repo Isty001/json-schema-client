@@ -64,6 +64,7 @@ WINDOW *ui_sub_window(double height, double width, double y, double x)
 {
     WINDOW *sub_window = derwin(container, height, width, y, x);
     scrollok(sub_window, true);
+    keypad(sub_window, true);
 
     assert(NULL != sub_window);
     box(sub_window, 0, 0);

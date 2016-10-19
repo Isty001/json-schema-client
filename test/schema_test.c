@@ -51,7 +51,9 @@ MU_TEST(test_schema_curl)
     iterator = schema_iterator();
     Schema *schema = iterator_seek(iterator, 0);
 
-    assert_string(schema->name, "user");
+    assert_string("user", schema->name);
+    assert_string("URL", schema->url);
+    assert_string("example.com", schema->api_url);
     mu_assert_int_eq(2, iterator_count(schema->links));
     iterator_walk(schema->links, assert_link);
 
@@ -75,7 +77,7 @@ MU_TEST(test_schema_file)
 
 MU_TEST(test_schema_stored)
 {
-    schema_load("user", "URL", "non_existent_url_to_test_storage");
+    schema_load("user", "non_existent_url_to_test_storage", "URL");
     iterator = schema_iterator();
 
     mu_assert_int_eq(1, iterator_count(iterator));

@@ -2,6 +2,9 @@
 #define API_TEST_storage_H
 
 
+#define SCHEMA_LIST_KEY "schema.list"
+
+
 #include <stdbool.h>
 
 
