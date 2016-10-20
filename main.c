@@ -5,12 +5,15 @@
 #include "src/ui/popup.h"
 #include "src/ui/message.h"
 #include "src/ui/response.h"
+#include "sandbox/schema_list.h"
 
 
 static void load_schemas(void)
 {
-    schema_load("Post", "./test/fixture/schema2.json", "http://jsonplaceholder.typicode.com");
-    schema_load("Auth", "./test/fixture/auth_schema.json", "https://httpbin.org");
+//    schema_load("Post", "./test/fixture/schema2.json", "http://jsonplaceholder.typicode.com");
+//    schema_load("Auth", "./test/fixture/auth_schema.json", "https://httpbin.org");
+
+    LOAD_SCHEMAS;
 }
 
 static void init(void)
