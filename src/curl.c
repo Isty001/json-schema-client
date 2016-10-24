@@ -99,7 +99,7 @@ static void perform(CURL *curl)
     int status;
 
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
-    asprintf(&msg, "%s | Status: %d", msg, status);
+    asprintf(&msg, "Curl: %s | Status: %d", msg, status);
 
     if (CURLE_OK == code) {
         message_success(msg);

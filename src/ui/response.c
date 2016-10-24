@@ -41,7 +41,7 @@ void response_refresh(void)
     if (!response) {
         return;
     }
-    wclear(window);
+    clear_window(window);
 
     int i = 0, y = PADDING / 2;
     size_t size = strlen(response);

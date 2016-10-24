@@ -80,7 +80,7 @@ static void build_form(Link *link)
     build_right_side();
     fields->iterator = iterator_init_from_stack(fields->set->stack);
 
-    field_set_array(fields->set);
+    field_set_finalize(fields->set);
 }
 
 Iterator *request_field_iterator(void)
@@ -88,9 +88,9 @@ Iterator *request_field_iterator(void)
     return fields->iterator;
 }
 
-FIELD **request_fields_to_array(void)
+FieldSet *request_field_set(void)
 {
-    return fields->set->array;
+    return fields->set;
 }
 
 void request_fields_init(Link *link, int width)

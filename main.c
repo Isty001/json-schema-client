@@ -14,8 +14,8 @@ static void init(void)
     curl_init();
     schema_init();
     schema_storage_unserialize();
-    message_init();
     ui_init();
+    message_init();
 }
 
 static void destroy(void)

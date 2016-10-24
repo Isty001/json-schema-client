@@ -9,6 +9,8 @@
 
 #define PADDING 2
 
+#define clear_window(w) wclear(w); box(w, 0, 0);
+
 
 typedef struct
 {

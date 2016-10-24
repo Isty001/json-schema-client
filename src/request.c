@@ -82,7 +82,7 @@ Request *request_create_from_hidden_form(Link *link)
 
     Iterator *iterator = request_field_iterator();
     request_fields_load(iterator, link);
-    FORM *form = new_form(request_fields_to_array());
+    FORM *form = new_form(request_field_set()->array);
     post_form(form);
 
     Request *request = request_create_from_fields(iterator, link, field_read);

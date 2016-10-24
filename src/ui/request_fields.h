@@ -3,13 +3,14 @@
 
 
 #include "../schema.h"
+#include "field.h"
 
 
 void request_fields_init(Link *link, int width);
 
 Iterator *request_field_iterator(void);
 
-FIELD **request_fields_to_array(void);
+FieldSet *request_field_set(void);
 
 void request_fields_destroy(void);
 

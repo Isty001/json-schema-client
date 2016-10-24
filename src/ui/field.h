@@ -16,7 +16,7 @@ typedef enum
     FIELD_PASSWORD,
     FIELD_DATA,
     FIELD_HREF,
-    FIELD_QUERY,
+    FIELD_QUERY
 } FieldType;
 
 typedef struct
@@ -47,9 +47,11 @@ FieldSet *field_set_init(int width, int chars_min);
 
 void field_set_add_label(FieldSet *set, char *text, int y, int x);
 
-void field_set_add_field(FieldSet *set, int y, int x, int lines, FieldType type, char *id);
+void field_set_add_field_without_attr(FieldSet *set, int y, int x, int height);
 
-void field_set_array(FieldSet *set);
+void field_set_add_field(FieldSet *set, int y, int x, int height, FieldType type, char *id);
+
+void field_set_finalize(FieldSet *set);
 
 void field_set_destroy(FieldSet *set);
 
