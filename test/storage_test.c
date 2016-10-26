@@ -3,18 +3,18 @@
 #include "unit_test.h"
 
 
-#define STORAGE_DIR "./test/fixture/storage"
+#define TEST_STORAGE_DIR "./test/fixture/storage"
 
 
 static void storage_teardown(void)
 {
-    unlink(STORAGE_DIR"/storage.txt");
-    rmdir(STORAGE_DIR);
+    unlink(TEST_STORAGE_DIR"/storage.txt");
+    rmdir(TEST_STORAGE_DIR);
 }
 
 MU_TEST(test_storage)
 {
-    storage_init(STORAGE_DIR);
+    storage_init(TEST_STORAGE_DIR);
 
     storage_set("test", "Hello");
     assert_string("Hello", storage_get("test"));
@@ -39,7 +39,7 @@ MU_TEST(test_storage)
 
 MU_TEST(test_persistance)
 {
-    storage_init(STORAGE_DIR);
+    storage_init(TEST_STORAGE_DIR);
 
     storage_set("User", "user");
     storage_set("User2", "user_2");
@@ -47,7 +47,7 @@ MU_TEST(test_persistance)
     storage_dump();
     storage_destroy();
 
-    storage_init(STORAGE_DIR);
+    storage_init(TEST_STORAGE_DIR);
 
     assert_string("user", storage_get("User"));
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <errno.h>
 #include "util.h"
 #include "storage.h"
 
@@ -76,7 +77,7 @@ void storage_init(char *dir)
     storage->allocated = sizeof(StorageItem);
     storage->items = malloc(storage->allocated);
     storage->dir = strdup(dir);
-    asprintf(&storage->file, "%s/storage.txt", dir);
+    asprintf(&storage->file, "%s/"STORAGE_FILE, dir);
 
     load_from_file();
 }

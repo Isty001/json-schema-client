@@ -10,7 +10,7 @@
 
 static void init(void)
 {
-    storage_init("./storage");
+    storage_init(TEST_STORAGE_DIR);
     curl_init();
     schema_init();
     schema_storage_unserialize();
