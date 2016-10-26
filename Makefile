@@ -4,7 +4,7 @@ APP = main.c $(COMMON_SOURCES) src/curl.c
 TEST_SOURCES = $(COMMON_SOURCES) test/*.c test/mock/*.c
 TEST_NCURSES_SOURCES = $(COMMON_SOURCES) test/ncurses/*.c test/mock/*.c
 
-STORAGE_DIR = $(shell realpath ~/schema-client/storage)
+STORAGE_DIR := $(shell realpath ~/schema-client/storage)
 STORAGE_FILE = storage.txt
 
 EXECUTABLE_TARGET = /usr/bin
@@ -13,6 +13,7 @@ ENVIRONMENT = -D _GNU_SOURCE -D STORAGE_DIR=\"$(STORAGE_DIR)\" -D STORAGE_FILE=\
 
 
 default:
+	make setup-env
 	make compile src="$(APP)" out="schema-client"
 	make install
 
@@ -22,10 +23,8 @@ run:
 
 setup-env:
 	mkdir -m 777 -p $(STORAGE_DIR)
-	touch $(STORAGE_DIR)/storage.txt
 
 compile:
-	make setup-env
 	gcc -Wall -Wextra -std=gnu11 -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre $(ENVIRONMENT)
 
 compile-test:
