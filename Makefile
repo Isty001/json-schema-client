@@ -22,7 +22,7 @@ run:
 	schema-client
 
 setup-env:
-	mkdir -m 777 -p $(STORAGE_DIR)
+	mkdir -p 777 -p $(STORAGE_DIR)
 
 compile:
 	gcc -Wall -Wextra -std=gnu11 -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre $(ENVIRONMENT)
