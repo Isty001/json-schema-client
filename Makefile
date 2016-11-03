@@ -4,7 +4,7 @@ APP = main.c $(COMMON_SOURCES) src/curl.c
 TEST_SOURCES = $(COMMON_SOURCES) test/*.c test/mock/*.c
 TEST_NCURSES_SOURCES = $(COMMON_SOURCES) test/ncurses/*.c test/mock/*.c
 
-STORAGE_DIR := $(shell realpath ~/schema-client/storage)
+STORAGE_DIR := $(shell realpath ~/.schema-client/storage)
 STORAGE_FILE = storage.txt
 
 EXECUTABLE_TARGET = /usr/bin
