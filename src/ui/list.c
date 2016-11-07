@@ -33,6 +33,16 @@ static SchemaList *list;
 static int last_selected_offset = 0;
 
 
+static void *current(ItemType type)
+{
+    ItemData *data = item_userptr(current_item(list->menu));
+
+    if (type == data->type){
+        return  data->ptr;
+    }
+    return NULL;
+}
+
 static void setup_list_menu(void)
 {
     list->menu = new_menu(list->items);
@@ -111,7 +121,9 @@ void list_init(WINDOW *window)
 
     setup_list_menu();
 
-    set_current_item(list->menu, list->items[last_selected_offset]);
+    if (current(LINK)) {
+        set_current_item(list->menu, list->items[last_selected_offset]);
+    }
     list_show_description();
 
     iterator_destroy(schemas);
@@ -158,16 +170,6 @@ void list_event(int input)
 
     menu_driver(list->menu, input);
     wrefresh(list->window);
-}
-
-static void *current(ItemType type)
-{
-    ItemData *data = item_userptr(current_item(list->menu));
-
-    if (type == data->type){
-        return  data->ptr;
-    }
-    return NULL;
 }
 
 Link *list_current_link(void)
