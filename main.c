@@ -69,6 +69,9 @@ static void handle_input(int input)
         case 'e':
             request_popup();
             break;
+        case 'i':
+            schema_inspect_popup();
+            break;
         case '\n':
             send_hidden_form();
             break;

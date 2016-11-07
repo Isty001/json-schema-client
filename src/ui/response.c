@@ -1,61 +1,24 @@
-#include <string.h>
-#include <ncurses.h>
-#include <assert.h>
 #include "response.h"
-#include "ui.h"
+#include "scroll.h"
+#include "../util.h"
 
 
-#define SCROLL_SPEED 4
-
-
-static WINDOW *window;
-static char *response = NULL;
-static int first_line, last_line, height, width;
+static Scroll *wscroll;
 
 
 void response_init_window(WINDOW *win)
 {
-    window = win;
-    getmaxyx(win, height, width);
-    last_line = height;
+    wscroll = scroll_init(win, 4);
 }
 
 void response_destroy(void)
 {
-    _free(response);
-}
-
-static int show_line(int i, int y, char *line)
-{
-    if (i >= first_line) {
-        mvwprintw(window, y, PADDING, line);
-
-        return y + (strlen(line) / width) + 1;
-    }
-
-    return y;
+    scroll_destroy(wscroll);
 }
 
 void response_refresh(void)
 {
-    if (!response) {
-        return;
-    }
-    clear_window(window);
-
-    int i = 0, y = PADDING / 2;
-    size_t size = strlen(response);
-    char *line, buff[size];
-
-    strncpy(buff, response, size);
-    line = strtok(buff, "\n");
-
-    while (NULL != line && i++ <= last_line) {
-        y = show_line(i, y, line);
-        line = strtok(NULL, "\n");
-    }
-
-    wrefresh(window);
+    scroll_display(wscroll);
 }
 
 void response_show(char *str)
@@ -64,37 +27,23 @@ void response_show(char *str)
         return;
     }
 
-    _free(response);
-    first_line = 0;
-
     char *pretty = json_prettify(str);
+    if (!pretty) {
+        pretty = str;
+    }
 
-    response = pretty ? pretty : str;
+    scroll_replace_content(wscroll, pretty);
+
     response_refresh();
 }
 
-void scroll_down(void)
-{
-    if (last_line != height) {
-        wscrl(window, -SCROLL_SPEED);
-        first_line -= SCROLL_SPEED;
-        last_line -= SCROLL_SPEED;
-    }
-}
-
-void scroll_up(void)
-{
-    first_line += SCROLL_SPEED;
-    last_line += SCROLL_SPEED;
-    wscrl(window, SCROLL_SPEED);
-}
 
 void response_scroll(int input)
 {
     if (input == 'k') {
-        scroll_down();
+        scroll_down(wscroll);
     } else if (input == 'l') {
-        scroll_up();
+        scroll_up(wscroll);
     }
 
     response_refresh();

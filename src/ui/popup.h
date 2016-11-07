@@ -8,5 +8,7 @@ void request_popup(void);
 
 void schema_add_popup(void);
 
+void schema_inspect_popup(void);
+
 
 #endif
