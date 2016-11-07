@@ -47,15 +47,14 @@ static void assert_mapped(int new)
 
 MU_TEST(test_iterator_map)
 {
-    int *items = malloc(2 * sizeof(int *));
-    items[0] = 1;
-    items[1] = 3;
+    int items[2] = {1,3};
 
-    Iterator *iterator = iterator_init((void *)items, 2);
+    Iterator *iterator = iterator_init((void **)items, 2);
     Iterator *new = iterator_map(iterator, (MapCallback) map_int);
 
     iterator_walk(new, (WalkCallback) assert_mapped);
 
+    free(iterator);
     iterator_destroy(new);
 }
 

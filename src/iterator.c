@@ -54,7 +54,6 @@ Iterator *iterator_map(Iterator *iterator, MapCallback callback)
     for (int i = 0; i < new->count; i++) {
         new->items[i] = callback(iterator->items[i]);
     }
-    iterator_destroy(iterator);
 
     return new;
 }
