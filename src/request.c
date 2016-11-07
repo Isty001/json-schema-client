@@ -5,6 +5,7 @@
 #include "href.h"
 #include "ui/request_fields.h"
 #include "ui/request_field_storage.h"
+#include "request_data.h"
 
 
 static void append_query(Request *request, char *query)
@@ -32,7 +33,7 @@ static void apply_field_on_request(FIELD *field, Request *request, FieldReader r
             request->headers = curl_slist_append(request->headers, remove_trailing_spaces(buffer));
             break;
         case FIELD_DATA:
-            request->data = dup_buffer(buffer);
+            request->data = request_data_load(dup_buffer(buffer));
             break;
         case FIELD_USER:
             request->user = dup_buffer(buffer);

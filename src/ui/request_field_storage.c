@@ -2,7 +2,6 @@
 #include <string.h>
 #include "field.h"
 #include "request_field_storage.h"
-#include "field.h"
 #include "../storage.h"
 
 

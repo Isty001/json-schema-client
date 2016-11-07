@@ -34,6 +34,8 @@ void free_multi(int count, ...);
 
 size_t file_size(FILE *file);
 
+char *file_read(char *path);
+
 char *json_prettify(char *json);
 
 bool is_string_empty(char *buffer);

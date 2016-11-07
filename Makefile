@@ -4,7 +4,7 @@ APP = main.c $(COMMON_SOURCES) src/curl.c
 TEST_SOURCES = $(COMMON_SOURCES) test/*.c test/mock/*.c
 TEST_NCURSES_SOURCES = $(COMMON_SOURCES) test/ncurses/*.c test/mock/*.c
 
-STORAGE_DIR := $(shell realpath ~/.schema-client/storage)
+STORAGE_DIR := $(shell realpath ~/.schema-client)
 STORAGE_FILE = storage.txt
 
 EXECUTABLE_TARGET = /usr/bin
@@ -22,7 +22,7 @@ run:
 	schema-client
 
 setup-env:
-	mkdir -p 777 -p $(STORAGE_DIR)
+	mkdir -p $(STORAGE_DIR)
 
 compile:
 	gcc -Wall -Wextra -std=gnu11 -g $(src) -o $(out) -lncurses -lmenu -lform -lcurl -lpcre $(ENVIRONMENT)

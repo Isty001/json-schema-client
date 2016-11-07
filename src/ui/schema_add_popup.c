@@ -28,10 +28,9 @@ static void load_schema_from_form(FieldSet *set)
     }
 }
 
-void schema_popup(void)
+void schema_add_popup(void)
 {
     Popup *popup = ui_popup_open(0.5, 0.7);
-
     FieldSet *set = schema_fields_init(popup->width * 0.75);
 
     FORM *form = form_create(popup->window, set);

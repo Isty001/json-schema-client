@@ -6,7 +6,7 @@
 #include "storage.h"
 
 
-#define BASE_LINK_STORAGE_KEY "schema.%s.links"
+#define BASE_LINK_STORAGE_KEY "schema.%s"
 
 
 static Stack *schemas;
@@ -77,33 +77,18 @@ static void load_links(JSON_Array *links, Stack *link_stack, char *api_url)
     }
 }
 
-static char *load_from_file(FILE *file)
-{
-    size_t size = file_size(file) + 1;
-    char *content = calloc(1, size);
-
-    fread(content, size, 1, file);
-    fclose(file);
-
-    return content;
-}
-
 static char *load_json(char *url)
 {
-    char *content;
+    char *content = file_read(url);
 
-    FILE *file = fopen(url, "r");
-
-    if (file) {
-        content = load_from_file(file);
-    } else {
-        content = curl_get(url);
+    if (NULL == content) {
+        return curl_get(url);
     }
 
     return content;
 }
 
-static char *create_storage_key(char *name)
+char *schema_storage_key(char *name)
 {
     char *key = malloc(strlen(BASE_LINK_STORAGE_KEY) + strlen(name));
 
@@ -118,15 +103,20 @@ static void load_links_and_destroy_root(JSON_Array *links, Stack *link_stack, ch
     json_value_free(root);
 }
 
+static JSON_Array *parser_links_from_schema(JSON_Value *schema_root)
+{
+    JSON_Object *schema = json_object(schema_root);
+    JSON_Value *links_root = json_object_get_value(schema, "links");
+
+    return json_value_get_array(links_root);
+}
+
 static void load_links_from_url(char *url, char *api_url, Stack *link_stack, char *storage_key)
 {
     char *json = load_json(url);
-
     JSON_Value *schema_root = json_parse_string(json);
-    JSON_Object *schema = json_object(schema_root);
-    JSON_Value *links_root = json_object_get_value(schema, "links");
-    JSON_Array *links = json_value_get_array(links_root);
-    char *serialized = json_serialize_to_string(links_root);
+    JSON_Array *links = parser_links_from_schema(schema_root);
+    char *serialized = json_serialize_to_string(schema_root);
 
     storage_set(storage_key, serialized);
     load_links_and_destroy_root(links, link_stack, api_url, schema_root);
@@ -134,21 +124,21 @@ static void load_links_from_url(char *url, char *api_url, Stack *link_stack, cha
     free_multi(2, serialized, json);
 }
 
-static void load_links_from_storage(char *links_json, char *api_url, Stack *link_stack)
+static void load_links_from_storage(char *schema_json, char *api_url, Stack *link_stack)
 {
-    JSON_Value *links_root = json_parse_string(links_json);
-    JSON_Array *links = json_value_get_array(links_root);
+    JSON_Value *schema_root = json_parse_string(schema_json);
+    JSON_Array *links = parser_links_from_schema(schema_root);
 
-    load_links_and_destroy_root(links, link_stack, api_url, links_root);
+    load_links_and_destroy_root(links, link_stack, api_url, schema_root);
 }
 
 void schema_load(char *name, char *url, char *api_url)
 {
-    char *links_json, *storage_key = create_storage_key(name);
+    char *schema_json, *storage_key = schema_storage_key(name);
     Stack *link_stack = stack_init();
 
-    if (NULL != (links_json = storage_get(storage_key))) {
-        load_links_from_storage(links_json, api_url, link_stack);
+    if (NULL != (schema_json = storage_get(storage_key))) {
+        load_links_from_storage(schema_json, api_url, link_stack);
     } else {
         load_links_from_url(url, api_url, link_stack, storage_key);
     }

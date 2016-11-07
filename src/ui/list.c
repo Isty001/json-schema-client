@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include "list.h"
-#include "../util.h"
 #include "ui.h"
 
 
@@ -18,6 +17,17 @@ typedef struct
     MENU *menu;
 } SchemaList;
 
+typedef enum
+{
+    SCHEMA,
+    LINK
+} ItemType;
+
+typedef struct
+{
+    ItemType type;
+    void *ptr;
+} ItemData;
 
 static SchemaList *list;
 static int last_selected_offset = 0;
@@ -34,6 +44,15 @@ static void setup_list_menu(void)
     post_menu(list->menu);
 }
 
+static ItemData *item_data(ItemType type, void *ptr)
+{
+    ItemData *data = malloc(sizeof(ItemData));
+    data->type = type;
+    data->ptr = ptr;
+
+    return data;
+}
+
 static ITEM *add_new_item(char *title)
 {
     ITEM *item = new_item(title, NULL);
@@ -47,7 +66,7 @@ static void create_link_items(Schema *schema)
     iterator_walk(schema->links, (WalkCallback) function(void, (Link * link) {
         ITEM *item = add_new_item(link->display);
 
-        set_item_userptr(item, link);
+        set_item_userptr(item, item_data(LINK, link));
     }));
 }
 
@@ -57,6 +76,7 @@ static void create_items(Iterator *schemas)
         ITEM *item = add_new_item(schema->name);
         item_opts_off(item, O_SELECTABLE);
 
+        set_item_userptr(item, item_data(SCHEMA, schema));
         create_link_items(schema);
     }));
 
@@ -99,11 +119,14 @@ void list_init(WINDOW *window)
 
 void list_destroy()
 {
+    ITEM *item;
     unpost_menu(list->menu);
     free_menu(list->menu);
 
     for (size_t i = 0; i < list->count; ++i) {
-        free_item(list->items[i]);
+        item = list->items[i];
+        free(item_userptr(item));
+        free_item(item);
     }
 
     free_multi(2, list, list->items);
@@ -137,7 +160,22 @@ void list_event(int input)
     wrefresh(list->window);
 }
 
+static void *current(ItemType type)
+{
+    ItemData *data = item_userptr(current_item(list->menu));
+
+    if (type == data->type){
+        return  data->ptr;
+    }
+    return NULL;
+}
+
 Link *list_current_link(void)
 {
-    return item_userptr(current_item(list->menu));
+    return current(LINK);
+}
+
+Schema *list_current_schema(void)
+{
+    return current(SCHEMA);
 }

@@ -6,7 +6,7 @@ void help_popup(void);
 
 void request_popup(void);
 
-void schema_popup(void);
+void schema_add_popup(void);
 
 
 #endif

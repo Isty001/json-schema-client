@@ -6,6 +6,7 @@ void run_storage_test(void);
 void run_util_tests(void);
 void run_request_test(void);
 void run_schema_storage_test(void);
+void run_request_data_test(void);
 
 
 typedef void * FIELD;
@@ -21,4 +22,5 @@ int main(void)
     run_util_tests();
     run_request_test();
     run_schema_storage_test();
+    run_request_data_test();
 }

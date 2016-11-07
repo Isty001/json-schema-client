@@ -31,6 +31,8 @@ void schema_load(char *name, char *url, char *api_url);
 
 Iterator *schema_iterator(void);
 
+char *schema_storage_key(char *name);
+
 int schema_count_links(void);
 
 void schema_destroy(void);

@@ -21,10 +21,25 @@ void free_multi(int count, ...)
 size_t file_size(FILE *file)
 {
     fseek(file, 0, SEEK_END);
-    int size = ftell(file);
+    long size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     return (size_t) size;
+}
+
+char *file_read(char *path)
+{
+    FILE *file = fopen(path, "r");
+    if (!file) {
+        return NULL;
+    }
+
+    size_t size = file_size(file) + 1;
+    char *buff = calloc(1, size);
+    fread(buff, size, 1, file);
+    fclose(file);
+
+    return buff;
 }
 
 char *json_prettify(char *json)

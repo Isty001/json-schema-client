@@ -64,7 +64,7 @@ static void handle_input(int input)
             help_popup();
             break;
         case 's':
-            schema_popup();
+            schema_add_popup();
             break;
         case 'e':
             request_popup();
