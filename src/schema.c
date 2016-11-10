@@ -4,13 +4,12 @@
 #include "curl.h"
 #include "../lib/parson.h"
 #include "storage.h"
+#include "schema_storage.h"
 
 
-#define BASE_LINK_STORAGE_KEY "schema.%s"
-
-
-static Stack *schemas;
+static Array *schemas;
 static int link_count = 0;
+
 
 static char *object_get(JSON_Object *obj, char *key)
 {
@@ -55,7 +54,7 @@ static Link *create_link(JSON_Object *link_schema, char *api_url)
     return link;
 }
 
-static Schema *create_schema(char *name, char *url, char *api_url, Stack *links)
+static Schema *create_schema(char *name, char *url, char *api_url, Array *links)
 {
     Schema *schema = malloc(sizeof(Schema));
     schema->name = strdup(name);
@@ -66,13 +65,13 @@ static Schema *create_schema(char *name, char *url, char *api_url, Stack *links)
     return schema;
 }
 
-static void load_links(JSON_Array *links, Stack *link_stack, char *api_url)
+static void load_links(JSON_Array *links, Array *link_stack, char *api_url)
 {
     JSON_Object *link_schema;
 
     for (size_t i = 0; i < json_array_get_count(links); i++) {
         link_schema = json_array_get_object(links, i);
-        stack_push(link_stack, create_link(link_schema, api_url));
+        array_push(link_stack, create_link(link_schema, api_url));
         link_count++;
     }
 }
@@ -88,16 +87,7 @@ static char *load_json(char *url)
     return content;
 }
 
-char *schema_storage_key(char *name)
-{
-    char *key = malloc(strlen(BASE_LINK_STORAGE_KEY) + strlen(name));
-
-    sprintf(key, BASE_LINK_STORAGE_KEY, name);
-
-    return key;
-}
-
-static void load_links_and_destroy_root(JSON_Array *links, Stack *link_stack, char *api_url, JSON_Value *root)
+static void load_links_and_destroy_root(JSON_Array *links, Array *link_stack, char *api_url, JSON_Value *root)
 {
     load_links(links, link_stack, api_url);
     json_value_free(root);
@@ -111,7 +101,7 @@ static JSON_Array *parser_links_from_schema(JSON_Value *schema_root)
     return json_value_get_array(links_root);
 }
 
-static void load_links_from_url(char *url, char *api_url, Stack *link_stack, char *storage_key)
+static void load_links_from_url(char *url, char *api_url, Array *link_stack, char *storage_key)
 {
     char *json = load_json(url);
     JSON_Value *schema_root = json_parse_string(json);
@@ -124,7 +114,7 @@ static void load_links_from_url(char *url, char *api_url, Stack *link_stack, cha
     free_multi(2, serialized, json);
 }
 
-static void load_links_from_storage(char *schema_json, char *api_url, Stack *link_stack)
+static void load_links_from_storage(char *schema_json, char *api_url, Array *link_stack)
 {
     JSON_Value *schema_root = json_parse_string(schema_json);
     JSON_Array *links = parser_links_from_schema(schema_root);
@@ -134,8 +124,8 @@ static void load_links_from_storage(char *schema_json, char *api_url, Stack *lin
 
 void schema_load(char *name, char *url, char *api_url)
 {
-    char *schema_json, *storage_key = schema_storage_key(name);
-    Stack *link_stack = stack_init();
+    char *schema_json, *storage_key = schema_storage_key_of(name);
+    Array *link_stack = array_init();
 
     if (NULL != (schema_json = storage_get(storage_key))) {
         load_links_from_storage(schema_json, api_url, link_stack);
@@ -144,12 +134,12 @@ void schema_load(char *name, char *url, char *api_url)
     }
 
     free(storage_key);
-    stack_push(schemas, create_schema(name, url, api_url, link_stack));
+    array_push(schemas, create_schema(name, url, api_url, link_stack));
 }
 
 Iterator *schema_iterator(void)
 {
-    return iterator_init_from_stack(schemas);
+    return iterator_init_from_array(schemas);
 }
 
 int schema_count_links(void)
@@ -159,11 +149,12 @@ int schema_count_links(void)
 
 void schema_init(void)
 {
-    schemas = stack_init();
+    schemas = array_init();
 }
 
 static void destroy_link(Link *link)
 {
+    link_count--;
     free_multi(8, link->href, link->method, link->rel, link->description, link->title, link->display, link->url, link);
 }
 
@@ -185,5 +176,17 @@ void schema_destroy(void)
 
     iterator_walk(iterator, (Free) destroy_schema);
     iterator_destroy(iterator);
-    stack_destroy(schemas);
+    array_destroy(schemas);
+}
+
+void schema_remove(char *name)
+{
+    array_filter(schemas, (ArrayFilter) function(bool, (Schema *schema){
+        if (0 == strcmp(name, schema->name)) {
+            destroy_schema(schema);
+
+            return false;
+        };
+        return true;
+    }));
 }

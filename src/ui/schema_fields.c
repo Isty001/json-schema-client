@@ -7,7 +7,7 @@ FieldSet *set;
 
 FieldSet *schema_fields_init(int width)
 {
-    set = field_set_init(width, width - PADDING * 2);
+    set = field_set_init(width, 200);
 
     field_set_add_label(set, "Name:", PADDING, PADDING);
     field_set_add_field_without_attr(set, 3, PADDING, 1);

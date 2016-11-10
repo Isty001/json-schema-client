@@ -57,6 +57,11 @@ MU_TEST(test_schema_curl)
     mu_assert_int_eq(2, iterator_count(schema->links));
     iterator_walk(schema->links, assert_link);
 
+    schema_remove("user");
+    iterator_destroy(iterator);
+    iterator = schema_iterator();
+    mu_assert_int_eq(0, iterator_count(iterator));
+
     storage_clear();
 }
 

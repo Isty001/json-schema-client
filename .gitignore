@@ -4,4 +4,5 @@ client.o
 test.o
 test-ncurses.o
 .idea/
+schema-client
 

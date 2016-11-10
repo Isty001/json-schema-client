@@ -3,6 +3,7 @@
 #include "../storage.h"
 #include "scroll.h"
 #include "ui.h"
+#include "../schema_storage.h"
 
 
 static void handle_input(Scroll *scroll, int ch)
@@ -25,7 +26,7 @@ void schema_inspect_popup(void)
     if (!schema) {
         return;
     }
-    char *key = schema_storage_key(schema->name);
+    char *key = schema_storage_key_of(schema->name);
     char *json = json_prettify(storage_get(key));
     Popup *popup = ui_popup_open(0.80, 0.70);
     Scroll *scroll = scroll_init(popup->window, 4);

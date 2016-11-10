@@ -78,7 +78,7 @@ static void build_form(Link *link)
 {
     build_left_side(link);
     build_right_side();
-    fields->iterator = iterator_init_from_stack(fields->set->stack);
+    fields->iterator = iterator_init_from_array(fields->set->stack);
 
     field_set_finalize(fields->set);
 }

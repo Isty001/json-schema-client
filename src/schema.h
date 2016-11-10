@@ -29,9 +29,9 @@ void schema_init(void);
 
 void schema_load(char *name, char *url, char *api_url);
 
-Iterator *schema_iterator(void);
+void schema_remove(char *name);
 
-char *schema_storage_key(char *name);
+Iterator *schema_iterator(void);
 
 int schema_count_links(void);
 

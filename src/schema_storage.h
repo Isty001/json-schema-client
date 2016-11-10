@@ -4,6 +4,8 @@
 
 void schema_storage_unserialize(void);
 
+char *schema_storage_key_of(char *name);
+
 void schema_storage_serialize(void);
 
 

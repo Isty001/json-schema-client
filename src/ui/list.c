@@ -37,10 +37,10 @@ static void *current(ItemType type)
 {
     ItemData *data = item_userptr(current_item(list->menu));
 
-    if (type == data->type){
-        return  data->ptr;
+    if (!data || type != data->type){
+        return NULL;
     }
-    return NULL;
+    return  data->ptr;
 }
 
 static void setup_list_menu(void)

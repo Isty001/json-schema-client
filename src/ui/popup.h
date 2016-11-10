@@ -10,5 +10,7 @@ void schema_add_popup(void);
 
 void schema_inspect_popup(void);
 
+void schema_remove_popup(void);
+
 
 #endif

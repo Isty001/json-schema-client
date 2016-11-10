@@ -1,7 +1,11 @@
+#include <string.h>
 #include "../lib/parson.h"
 #include "iterator.h"
 #include "schema.h"
 #include "storage.h"
+
+
+#define BASE_LINK_STORAGE_KEY "schema.%s"
 
 
 #define json_object_get_char(o, key) (char *) json_object_dotget_string(schema, key)
@@ -78,4 +82,13 @@ void schema_storage_unserialize(void)
     load_schemas(json_array(array_root));
 
     json_value_free(array_root);
+}
+
+char *schema_storage_key_of(char *name)
+{
+    char *key = malloc(strlen(BASE_LINK_STORAGE_KEY) + strlen(name));
+
+    sprintf(key, BASE_LINK_STORAGE_KEY, name);
+
+    return key;
 }

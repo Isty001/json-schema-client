@@ -2,7 +2,7 @@
 #define API_TEST_ITERATOR_H
 
 
-#include "stack.h"
+#include "array.h"
 
 
 typedef void (*WalkCallback)(void *item);
@@ -16,9 +16,9 @@ typedef struct iterator Iterator;
 
 Iterator *iterator_init(void **items, int count);
 
-Iterator *iterator_init_from_stack(Stack *stack);
+Iterator *iterator_init_from_array(Array *array);
 
-Iterator *iterator_init_from_stack_destroy(Stack *stack);
+Iterator *iterator_init_from_stack_destroy(Array *array);
 
 void iterator_walk(Iterator *iterator, WalkCallback callback);
 

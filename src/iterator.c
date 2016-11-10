@@ -18,15 +18,15 @@ Iterator *iterator_init(void **items, int count)
     return iterator;
 }
 
-Iterator *iterator_init_from_stack(Stack *stack)
+Iterator *iterator_init_from_array(Array *array)
 {
-    return iterator_init(stack_to_array(stack), stack_count(stack));
+    return iterator_init(array_values(array), array_count(array));
 }
 
-Iterator *iterator_init_from_stack_destroy(Stack *stack)
+Iterator *iterator_init_from_stack_destroy(Array *array)
 {
-    Iterator *iterator = iterator_init_from_stack(stack);
-    stack_destroy(stack);
+    Iterator *iterator = iterator_init_from_array(array);
+    array_destroy(array);
 
     return iterator;
 }
@@ -60,7 +60,7 @@ Iterator *iterator_map(Iterator *iterator, MapCallback callback)
 
 size_t iterator_count(Iterator *iterator)
 {
-    return iterator->count;
+    return (size_t) iterator->count;
 }
 
 void iterator_destroy(Iterator *iterator)

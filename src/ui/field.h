@@ -3,7 +3,7 @@
 
 
 #include <form.h>
-#include "../stack.h"
+#include "../array.h"
 
 
 #define is_input(field) flag_exists(field_opts(field), O_ACTIVE)
@@ -30,7 +30,7 @@ typedef struct
 {
     int width;
     int chars_min;
-    Stack *stack;
+    Array *stack;
     FIELD **array;
 } FieldSet;
 

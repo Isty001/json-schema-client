@@ -51,7 +51,7 @@ void field_set_add_label(FieldSet *set, char *text, int y, int x)
     field_opts_off(label, O_ACTIVE);
     set_field_buffer(label, 0, text);
 
-    stack_push(set->stack, label);
+    array_push(set->stack, label);
 }
 
 static FIELD *create_default_field(int y, int x, int height, FieldSet *set)
@@ -67,7 +67,7 @@ static FIELD *create_default_field(int y, int x, int height, FieldSet *set)
 
 void field_set_add_field_without_attr(FieldSet *set, int y, int x, int height)
 {
-    stack_push(set->stack, create_default_field(y, x, height, set));
+    array_push(set->stack, create_default_field(y, x, height, set));
 }
 
 void field_set_add_field(FieldSet *set, int y, int x, int height, FieldType type, char *id)
@@ -75,13 +75,13 @@ void field_set_add_field(FieldSet *set, int y, int x, int height, FieldType type
     FIELD *field = create_default_field(y, x, height, set);
     set_field_userptr(field, field_attributes_create(type, id));
 
-    stack_push(set->stack, field);
+    array_push(set->stack, field);
 }
 
 FieldSet *field_set_init(int width, int chars_min)
 {
     FieldSet *set = malloc(sizeof(FieldSet));
-    set->stack = stack_init();
+    set->stack = array_init();
     set->width = width;
     set->chars_min = chars_min;
 
@@ -90,13 +90,13 @@ FieldSet *field_set_init(int width, int chars_min)
 
 void field_set_finalize(FieldSet *set)
 {
-    stack_push(set->stack, NULL);
-    set->array = (FIELD **) stack_to_array(set->stack);
-    stack_pop(set->stack);
+    array_push(set->stack, NULL);
+    set->array = (FIELD **) array_values(set->stack);
+    array_pop(set->stack);
 }
 
 void field_set_destroy(FieldSet *set)
 {
-    stack_destroy_callback(set->stack, (Free) field_destroy);
+    array_destroy_callback(set->stack, (Free) field_destroy);
     free_multi(2, set->array, set);
 }

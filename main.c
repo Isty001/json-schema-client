@@ -72,6 +72,10 @@ static void handle_input(int input)
         case 'i':
             schema_inspect_popup();
             break;
+        case 'd':
+            schema_remove_popup();
+            break;
+        case KEY_ENTER:
         case '\n':
             send_hidden_form();
             break;
