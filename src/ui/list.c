@@ -31,6 +31,7 @@ typedef struct
 
 static SchemaList *list;
 static int last_selected_offset = 0;
+static int scroll_row = 0;
 
 
 static void *current(ItemType type)
@@ -121,9 +122,12 @@ void list_init(WINDOW *window)
 
     setup_list_menu();
 
-    if (current(LINK)) {
-        set_current_item(list->menu, list->items[last_selected_offset]);
+    set_current_item(list->menu, list->items[last_selected_offset]);
+
+    for (int i = last_selected_offset; i>0; i--) {
+        menu_driver(list->menu, REQ_DOWN_ITEM);
     }
+
     list_show_description();
 
     iterator_destroy(schemas);
