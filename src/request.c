@@ -88,9 +88,9 @@ Request *request_create_from_hidden_form(Link *link)
 
     Request *request = request_create_from_fields(iterator, link, field_read);
 
-    request_fields_destroy();
     unpost_form(form);
     free_form(form);
+    request_fields_destroy();
 
     return request;
 }
