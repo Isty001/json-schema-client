@@ -15,7 +15,7 @@ static void print_help(Popup *popup, int y, char *text)
 
 void help_popup(void)
 {
-    Popup *popup = ui_popup_open(0.5, 0.4);
+    Popup *popup = ui_popup_open(0.5, 0.5);
 
     underline(print_help(popup, 1, "General"));
     print_help(popup, 2, "h - Help");

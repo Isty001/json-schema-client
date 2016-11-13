@@ -121,10 +121,9 @@ void list_init(WINDOW *window)
 
     setup_list_menu();
 
-    for (int i = last_selected_offset; i>0; i--) {
+    for (int i = last_selected_offset; i > 1; i--) {
         menu_driver(list->menu, REQ_DOWN_ITEM);
     }
-    set_current_item(list->menu, list->items[last_selected_offset]);
     list_show_description();
 
     iterator_destroy(schemas);
